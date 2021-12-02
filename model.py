@@ -173,10 +173,10 @@ class Table:
 
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
-table = Table(3, 3)
-table.mergeCells('A1, B1')
-print(table.getMergedCells())
+#table = Table(3, 3)
+#table.mergeCells('A1, B1')
+#print(table.getMergedCells())
 #print(table.getContent()[0][2].setValue(6))
 #print([cell.getIndex() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
-table.divideCells('A1')
-print(table.getMergedCells())
+#table.divideCells('A1')
+#print(table.getMergedCells())
