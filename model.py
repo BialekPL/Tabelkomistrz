@@ -148,23 +148,35 @@ class Table:
                         if cell.getPosition() != positions[0]:
                             cell.setValue(None) #nwm czy pozostałe komórki ustawiać na zero czy null czy jak 
         except ValueError:
-            print('Zły format indeksów')
-    def divideCells(self, position):
+            print('Zły format indeksów/komórki nie da się rozdzielić')
+
+    def divideCells(self, index):
         '''
         Służy do dzielenia komórek
         position - pozycja komórki którą rozdzielamy 
         '''
-        for row in self.__mergedCells:
-            if position in row:
-                self.__mergedCells.remove(row)
+        try:
+            cellsIndexes = [cell.getIndex() for i in range(len(self.getContent())) for cell in self.getContent()[i]]
+            cellsPos = [cell.getPosition() for i in range(len(self.getContent())) for cell in self.getContent()[i]]
+            for i in range(len(cellsIndexes)):
+                if cellsIndexes[i] == index:
+                    position = i
+            if index not in cellsIndexes:
+                raise ValueError
+            for row in self.__mergedCells:
+                if position in row:
+                    self.__mergedCells.remove(row)
+        except ValueError:
+            print('Zły index')
 
 
 
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
-#table = Table(3, 3)
-#table.mergeCells('A1,A3')
-#print(table.getMergedCells())
+table = Table(3, 3)
+table.mergeCells('A1, B1')
+print(table.getMergedCells())
 #print(table.getContent()[0][2].setValue(6))
 #print([cell.getIndex() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
-#table.divideCells(2)
+table.divideCells('A1')
+print(table.getMergedCells())
