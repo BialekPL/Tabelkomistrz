@@ -3,220 +3,230 @@ from tkinter.ttk import Notebook
 from tkinter import Grid
 import string
 
-#region rozmiary itp. 
-rows = 30
-columns = 15
-vis_rows = 15
-vis_cols = 7
-#endregion
+class App():
+    #region Funkcja - tworzenie siatki komórek
+    def createCellFrame(self):
+        self.mainFrame = tk.Frame(self.root)
+        self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
 
-#region Funkcja - tworzenie siatki komórek
-def createCellFrame(root, rows, columns, vis_rows, vis_cols):
-    mainFrame = tk.Frame(root)
-    mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+        self.mainCanvas = tk.Canvas(self.mainFrame)
+        self.mainCanvas.grid(row=0, column=0)
 
-    mainCanvas = tk.Canvas(mainFrame)
-    mainCanvas.grid(row=0, column=0)
+        self.mainSvertical = tk.Scrollbar(self.mainFrame, orient='vertical', command=self.mainCanvas.yview)
+        self.mainSvertical.grid(row=0,column=1,sticky='ns')
+        self.mainCanvas.configure(yscrollcommand=self.mainSvertical.set)
 
-    mainSvertical = tk.Scrollbar(mainFrame, orient='vertical', command=mainCanvas.yview)
-    mainSvertical.grid(row=0,column=1,sticky='ns')
-    mainCanvas.configure(yscrollcommand=mainSvertical.set)
+        self.mainShorizontal = tk.Scrollbar(self.mainFrame, orient='horizontal', command=self.mainCanvas.xview)
+        self.mainShorizontal.grid(row=1, column=0, sticky='ew')
+        self.mainCanvas.configure(xscrollcommand=self.mainShorizontal.set)
 
-    mainShorizontal = tk.Scrollbar(mainFrame, orient='horizontal', command=mainCanvas.xview)
-    mainShorizontal.grid(row=1, column=0, sticky='ew')
-    mainCanvas.configure(xscrollcommand=mainShorizontal.set)
+        # listy indexów komórek wyświetlane nad siatką i po lewej stronie siatki
+        self.cellFrame = tk.Frame(self.mainCanvas)
 
-    # listy indexów komórek wyświetlane nad siatką i po lewej stronie siatki
-    cellFrame = tk.Frame(mainCanvas)
+        rowIndex = [i for i in range(0,self.rows,1)]
+        columnIndex = list(string.ascii_uppercase)
+        for i in range(self.columns):
+            columnIndex[i] = tk.Label(self.cellFrame, text=f'{columnIndex[i]}', width=17)
+            columnIndex[i].grid(row=0, column=i+1, sticky='news')
 
-    rowIndex = [i for i in range(0,rows,1)]
-    columnIndex = list(string.ascii_uppercase)
-    for i in range(columns):
-        columnIndex[i] = tk.Label(cellFrame, text=f'{columnIndex[i]}', width=17)
-        columnIndex[i].grid(row=0, column=i+1, sticky='news')
+        for i in range(self.rows):
+            rowIndex[i] = tk.Label(self.cellFrame, text=f'{rowIndex[i]}')
+            rowIndex[i].grid(column=0, row=i+1, sticky='news')
 
-    for i in range(rows):
-        rowIndex[i] = tk.Label(cellFrame, text=f'{rowIndex[i]}')
-        rowIndex[i].grid(column=0, row=i+1, sticky='news')
+        # siatka komórek edytowalnych
+        cells = [["" for i in range(self.columns)] for j in range(self.rows)]
+        for i in range(self.rows):
+            for j in range(self.columns):
+                cells[i][j] = tk.Text(self.cellFrame, width=15, height=1)
+                cells[i][j].grid(row=i+1, column=j+1,sticky='news')
 
-    # siatka komórek edytowalnych
-    cells = [["" for i in range(columns)] for j in range(rows)]
-    for i in range(rows):
-        for j in range(columns):
-            cells[i][j] = tk.Text(cellFrame, width=15, height=1)
-            cells[i][j].grid(row=i+1, column=j+1,sticky='news')
+        self.mainCanvas.create_window((0,0), window=self.cellFrame, anchor='nw')
+        self.cellFrame.update_idletasks()
+        bbox=self.mainCanvas.bbox('all')
 
-    mainCanvas.create_window((0,0), window=cellFrame, anchor='nw')
-    cellFrame.update_idletasks()
-    bbox=mainCanvas.bbox('all')
+        # w,h = bbox[2]-bbox[1], bbox[3]-bbox[1]
+        dw, dh = int(127 * self.vis_cols), int(25 * self.vis_rows)
+        self.mainCanvas.configure(scrollregion=bbox, width=dw, height=dh)
 
-    # w,h = bbox[2]-bbox[1], bbox[3]-bbox[1]
-    dw, dh = int(127 * vis_cols), int(25 * vis_rows)
-    mainCanvas.configure(scrollregion=bbox, width=dw, height=dh)
+        return self.mainFrame
+    #endregion
 
-    return mainFrame
-#endregion
+    def __init__(self,master):
+        self.root = master
 
-#region Funkcja - zminana rozmiaru siatki
-def basicSizeButton():
-    columns = int(basicSc.get())
-    rows = int(basicSr.get())
-    mainFrame = createCellFrame(root, rows, columns, vis_rows, vis_cols)
-    mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
-# endregion
+        #region rozmiary itp.
+        self.rows = 30      #liczba rzędów komórek
+        self.columns = 15   #liczba kolumn komórek
+        self.vis_rows = 15  #liczba widocznych rzędów komórek
+        self.vis_cols = 7   #liczba widocznych kolumn komórek
+        #endregion
 
-#region Funkcja - scalanie komórek
-def mergeCells():
-    text = editEmerge.get().split(',')
-    text = [i.upper() for i in text]
-    for i in text:
-        print("scalane komórki: ",i[0]," ",int(i[1]))
+        #region Utworzenie głównego okna
+        self.root.geometry("950x510")       #rozmiar głównego okna (szer x wys)
+        self.root.title("Tabelkomistrz")    #nazwa/tytuł okna głónego
+        self.root.resizable(False, False)   #uniemożliwnie zmiany rozmiaru okna głównego
+        self.usedFont = {'family': 'Segoe UI', 'size': 9, 'weight': 'normal', 'slant': 'italic', 'underline': 0, 'overstrike': 0}
+        
+        Grid.rowconfigure(self.root,index=0,weight=1)
+        Grid.rowconfigure(self.root,index=1,weight=10)
+        Grid.columnconfigure(self.root,index=0,weight=1)
+        #endregion
+
+        #region Utworzenie panelu z zakładkami
+        self.tabsPanel = Notebook(self.root, height=55)
+        self.tabsPanel.grid(row=0, sticky='we')
+        #endregion
+
+        #region Dodawanie nowych zakładek
+        Grid.columnconfigure(self.tabsPanel, index=0, weight=1)
+        Grid.rowconfigure(self.tabsPanel, index=0, weight=1)
+
+        self.tabBasic = tk.Frame(self.tabsPanel, height=30)
+        self.tabEdit = tk.Frame(self.tabsPanel, height=30)
+        self.tabImpExp = tk.Frame(self.tabsPanel, height=30)
+
+        self.tabBasic.grid(row=0, column=0, sticky='news')
+        self.tabEdit.grid(row=0, column=0, sticky='news')
+        self.tabImpExp.grid(row=0, column=0)
+
+        self.tabsPanel.add(self.tabBasic, text='Podstawowe')
+        self.tabsPanel.add(self.tabEdit, text='Edytuj')
+        self.tabsPanel.add(self.tabImpExp, text='Import/Eksport')
+        #endregion
+
+        #region Zawartość zakładki "Podstawowe"
+        Grid.columnconfigure(self.tabBasic, index=0, weight=0)
+        Grid.columnconfigure(self.tabBasic, index=1, weight=0)
+        Grid.columnconfigure(self.tabBasic, index=2, weight=0)
+        Grid.columnconfigure(self.tabBasic, index=3, weight=0)
+        Grid.columnconfigure(self.tabBasic, index=4, weight=0)
+        Grid.columnconfigure(self.tabBasic, index=5, weight=1)
+        Grid.columnconfigure(self.tabBasic, index=6, weight=7)
+        Grid.rowconfigure(self.tabBasic, index=0, weight=1)
+
+        self.basicLdim = tk.Label(self.tabBasic, text='Wymiary tabeli: ')
+        self.basicLdim.configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold'))
+        self.basicLdim.grid(row=0, column=0,sticky=tk.W)
+
+        self.basicLr = tk.Label(self.tabBasic,text="L. wierszy:")
+        self.basicLr.grid(row=0, column=1,sticky=tk.W)
+        self.basicSr = tk.Spinbox(self.tabBasic, from_=1, to_=50, width=5)
+        self.basicSr.grid(row=0, column=2,sticky=tk.W)
+
+        self.basicLc = tk.Label(self.tabBasic,text="L. kolumn:")
+        self.basicLc.grid(row=0, column=3,sticky=tk.W)
+        self.basicSc = tk.Spinbox(self.tabBasic, from_=1, to_=21, width=5)
+        self.basicSc.grid(row=0, column=4,sticky=tk.W)
+
+        self.basicBchange = tk.Button(self.tabBasic, text="Zmień", command = lambda: self.basicSizeButton())
+        self.basicBchange.grid(row=0, column=5)
+
+        self.basicBtemplate = tk.Button(self.tabBasic, text="Załaduj szablon")
+        self.basicBtemplate.grid(row=0,column=6,sticky=tk.E)
+        #endregion
+
+        #region Zawartość zakładki "Edytuj"
+        Grid.columnconfigure(self.tabEdit, index=0, weight=0)
+        Grid.columnconfigure(self.tabEdit, index=1, weight=0)
+        Grid.columnconfigure(self.tabEdit, index=2, weight=1)
+        Grid.columnconfigure(self.tabEdit, index=3, weight=0)
+        Grid.columnconfigure(self.tabEdit, index=4, weight=0)
+        Grid.columnconfigure(self.tabEdit, index=5, weight=1)
+        Grid.columnconfigure(self.tabEdit, index=6, weight=0)
+        Grid.columnconfigure(self.tabEdit, index=7, weight=0)
+        Grid.columnconfigure(self.tabEdit, index=8, weight=0)
+        Grid.rowconfigure(self.tabEdit, index=0, weight=1)
+
+        self.editLmerge = tk.Label(self.tabEdit,text='Scal komórki:')
+        self.editLmerge.grid(row=0, column=0,sticky=tk.W)
+
+        self.editEmerge = tk.Entry(self.tabEdit)
+        self.editEmerge.grid(row=0, column=1,sticky=tk.W)
+
+        self.editBmerge = tk.Button(self.tabEdit,text="Scal",command=lambda: self.mergeCells())
+        self.editBmerge.grid(row=0, column=2,sticky=tk.W)
+
+        self.editLdev = tk.Label(self.tabEdit,text='Rozdziel komórki:')
+        self.editLdev.grid(row=0, column=3,sticky=tk.W)
+
+        self.editEdev = tk.Entry(self.tabEdit)
+        self.editEdev.grid(row=0, column=4,sticky=tk.W)
+
+        self.editBdev = tk.Button(self.tabEdit, text="Rozdziel")
+        self.editBdev.grid(row=0, column=5,sticky=tk.W)
+
+        self.editBb = tk.Button(self.tabEdit, text="B")
+        self.editBb.configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold'))
+        self.editBb.grid(row=0, column=6,sticky=tk.E)
+
+        self.editBi = tk.Button(self.tabEdit, text="I")
+        self.editBi.configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'italic'))
+        self.editBi.grid(row=0, column=7,sticky=tk.E)
+
+        self.editBu = tk.Button(self.tabEdit,text="U")
+        self.editBu.configure(underline=0)
+        self.editBu.grid(row=0, column=8,sticky=tk.E)
+        #endregion
+
+        #region Zawartość zakładki "Import/Eksport"
+        Grid.columnconfigure(self.tabImpExp, index=0, weight=0)
+        Grid.columnconfigure(self.tabImpExp, index=1, weight=1)
+        Grid.columnconfigure(self.tabImpExp, index=2, weight=1)
+        Grid.columnconfigure(self.tabImpExp, index=3, weight=0)
+        Grid.rowconfigure(self.tabImpExp, index=0, weight=1)
+
+        self.impexpLimp = tk.Label(self.tabImpExp, text="Eksport do LaTeX: ")
+        self.impexpLimp.grid(row=0, column=0,sticky=tk.W)
+        self.impexpBimp = tk.Button(self.tabImpExp, text="Eksportuj")
+        self.impexpBimp.grid(row=0, column=1,sticky=tk.W)
+
+        self.impexpLexp = tk.Label(self.tabImpExp, text="Import tabeli z LaTeX: ")
+        self.impexpLexp.grid(row=0, column=2,sticky=tk.E)
+        self.impexpBexp = tk.Button(self.tabImpExp, text="Importuj")
+        self.impexpBexp.grid(row=0, column=3,sticky=tk.E)
+        #endregion
+
+        #region Siatka z komórkami
+        self.mainFrame = self.createCellFrame()
+        self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+        #endregion
     
-    #sprawdzić czy poprawnie wpisane komórki
 
-    #sprawdzić czy komórki mogą być scalone
+    #region Funkcja - zminana rozmiaru siatki
+    def basicSizeButton(self):
+        self.columns = int(self.basicSc.get())
+        self.rows = int(self.basicSr.get())
+        self.mainFrame = self.createCellFrame()
+        self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+    # endregion
 
-    #sprawdzić czy są scalane rzędami czy kolumnami
+    #region Funkcja - scalanie komórek
+    def mergeCells(self):
+        text = self.editEmerge.get().split(',')
+        text = [i.upper() for i in text]
+        for i in text:
+            print("scalane komórki: ",i[0]," ",int(i[1]))
+        
+        #sprawdzić czy poprawnie wpisane komórki
 
-    #łącznie komórek w wierszu
-    # cells[0][4] = tk.Text(cellFrame,width=15,height=1)
-    # cells[0][4].grid(row=1, column=5, columnspan=2, sticky='news')
-    
-    #łączenie komórek w kolumnie
-    # cells[0][1] = tk.Text(cellFrame,width=15,height=1)
-    # cells[0][1].grid(row=1, column=2, rowspan=2, sticky='news')
+        #sprawdzić czy komórki mogą być scalone
 
-#endregion
+        #sprawdzić czy są scalane rzędami czy kolumnami
 
-#region Utworzenie głównego okna
-root = tk.Tk()
-root.geometry("950x510")
-root.title("Tabelkomistrz")
-root.resizable(False, False)
-usedFont = {'family': 'Segoe UI', 'size': 9, 'weight': 'normal', 'slant': 'italic', 'underline': 0, 'overstrike': 0}
+        #łącznie komórek w wierszu
+        # cells[0][4] = tk.Text(cellFrame,width=15,height=1)
+        # cells[0][4].grid(row=1, column=5, columnspan=2, sticky='news')
+        
+        #łączenie komórek w kolumnie
+        # cells[0][1] = tk.Text(cellFrame,width=15,height=1)
+        # cells[0][1].grid(row=1, column=2, rowspan=2, sticky='news')
 
-Grid.rowconfigure(root,index=0,weight=1)
-Grid.rowconfigure(root,index=1,weight=10)
-Grid.columnconfigure(root,index=0,weight=1)
-#endregion
+    #endregion
 
-#region Utworzenie panelu z zakładkami
-tabsPanel = Notebook(root, height=55)
-tabsPanel.grid(row=0, sticky='we')
-#endregion
+def main():
+    root = tk.Tk()
+    App(root)
+    root.mainloop()
 
-#region Dodawanie nowych zakładek
-Grid.columnconfigure(tabsPanel, index=0, weight=1)
-Grid.rowconfigure(tabsPanel, index=0, weight=1)
-
-tabBasic = tk.Frame(tabsPanel, height=30)
-tabEdit = tk.Frame(tabsPanel, height=30)
-tabImpExp = tk.Frame(tabsPanel, height=30)
-
-tabBasic.grid(row=0, column=0, sticky='news')
-tabEdit.grid(row=0, column=0, sticky='news')
-tabImpExp.grid(row=0, column=0)
-
-tabsPanel.add(tabBasic, text='Podstawowe')
-tabsPanel.add(tabEdit, text='Edytuj')
-tabsPanel.add(tabImpExp, text='Import/Eksport')
-#endregion
-
-#region Zawartość zakładki "Podstawowe"
-Grid.columnconfigure(tabBasic, index=0, weight=0.5)
-Grid.columnconfigure(tabBasic, index=1, weight=0.5)
-Grid.columnconfigure(tabBasic, index=2, weight=0.5)
-Grid.columnconfigure(tabBasic, index=3, weight=0.5)
-Grid.columnconfigure(tabBasic, index=4, weight=0.5)
-Grid.columnconfigure(tabBasic, index=5, weight=1)
-Grid.columnconfigure(tabBasic, index=6, weight=7)
-Grid.rowconfigure(tabBasic, index=0, weight=1)
-
-basicLdim = tk.Label(tabBasic, text='Wymiary tabeli: ')
-basicLdim.configure(font=(f"{usedFont['family']}", usedFont['size'], 'bold'))
-basicLdim.grid(row=0, column=0,sticky=tk.W)
-
-basicLr = tk.Label(tabBasic,text="L. wierszy:")
-basicLr.grid(row=0, column=1,sticky=tk.W)
-basicSr = tk.Spinbox(tabBasic, from_=1, to_=50, width=5)
-basicSr.grid(row=0, column=2,sticky=tk.W)
-
-basicLc = tk.Label(tabBasic,text="L. kolumn:")
-basicLc.grid(row=0, column=3,sticky=tk.W)
-basicSc = tk.Spinbox(tabBasic, from_=1, to_=21, width=5)
-basicSc.grid(row=0, column=4,sticky=tk.W)
-
-basicBchange = tk.Button(tabBasic, text="Zmień", command = lambda: basicSizeButton())
-basicBchange.grid(row=0, column=5)
-
-basicBtemplate = tk.Button(tabBasic, text="Załaduj szablon")
-basicBtemplate.grid(row=0,column=6,sticky=tk.E)
-#endregion
-
-#region Zawartość zakładki "Edytuj"
-Grid.columnconfigure(tabEdit, index=0, weight=0.5)
-Grid.columnconfigure(tabEdit, index=1, weight=0.5)
-Grid.columnconfigure(tabEdit, index=2, weight=1)
-Grid.columnconfigure(tabEdit, index=3, weight=0.5)
-Grid.columnconfigure(tabEdit, index=4, weight=0.5)
-Grid.columnconfigure(tabEdit, index=5, weight=1)
-Grid.columnconfigure(tabEdit, index=6, weight=0.5)
-Grid.columnconfigure(tabEdit, index=7, weight=0.5)
-Grid.columnconfigure(tabEdit, index=8, weight=0.5)
-Grid.rowconfigure(tabEdit, index=0, weight=1)
-
-editLmerge = tk.Label(tabEdit,text='Scal komórki:')
-editLmerge.grid(row=0, column=0,sticky=tk.W)
-
-editEmerge = tk.Entry(tabEdit)
-editEmerge.grid(row=0, column=1,sticky=tk.W)
-
-editBmerge = tk.Button(tabEdit,text="Scal",command=lambda: mergeCells())
-editBmerge.grid(row=0, column=2,sticky=tk.W)
-
-editLdev = tk.Label(tabEdit,text='Rozdziel komórki:')
-editLdev.grid(row=0, column=3,sticky=tk.W)
-
-editEdev = tk.Entry(tabEdit)
-editEdev.grid(row=0, column=4,sticky=tk.W)
-
-editBdev = tk.Button(tabEdit, text="Rozdziel")
-editBdev.grid(row=0, column=5,sticky=tk.W)
-
-editBb = tk.Button(tabEdit, text="B")
-editBb.configure(font=(f"{usedFont['family']}", usedFont['size'], 'bold'))
-editBb.grid(row=0, column=6,sticky=tk.E)
-
-editBi = tk.Button(tabEdit, text="I")
-editBi.configure(font=(f"{usedFont['family']}", usedFont['size'], 'italic'))
-editBi.grid(row=0, column=7,sticky=tk.E)
-
-editBu = tk.Button(tabEdit,text="U")
-editBu.configure(underline=0)
-editBu.grid(row=0, column=8,sticky=tk.E)
-#endregion
-
-#region Zawartość zakładki "Import/Eksport"
-Grid.columnconfigure(tabImpExp, index=0, weight=0.5)
-Grid.columnconfigure(tabImpExp, index=1, weight=1)
-Grid.columnconfigure(tabImpExp, index=2, weight=1)
-Grid.columnconfigure(tabImpExp, index=3, weight=0.5)
-Grid.rowconfigure(tabImpExp, index=0, weight=1)
-
-impexpLimp = tk.Label(tabImpExp, text="Eksport do LaTeX: ")
-impexpLimp.grid(row=0, column=0,sticky=tk.W)
-impexpBimp = tk.Button(tabImpExp, text="Eksportuj")
-impexpBimp.grid(row=0, column=1,sticky=tk.W)
-
-impexpLexp = tk.Label(tabImpExp, text="Import tabeli z LaTeX: ")
-impexpLexp.grid(row=0, column=2,sticky=tk.E)
-impexpBexp = tk.Button(tabImpExp, text="Importuj")
-impexpBexp.grid(row=0, column=3,sticky=tk.E)
-#endregion
-
-#region Siatka z komórkami
-mainFrame = createCellFrame(root, rows, columns, vis_rows, vis_cols)
-mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
-#endregion
-
-root.mainloop()
+if __name__ == '__main__':
+    main()
