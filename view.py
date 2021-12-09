@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter.ttk import Notebook
-from tkinter import Grid
+from tkinter import Grid, messagebox
 import string
 
 class App():
@@ -194,10 +194,12 @@ class App():
 
     #region Funkcja - zminana rozmiaru siatki
     def basicSizeButton(self):
-        self.columns = int(self.basicSc.get())
-        self.rows = int(self.basicSr.get())
-        self.mainFrame = self.createCellFrame()
-        self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+        res = messagebox.askyesno('Zmiana rozmiaru tabeli','Ta operacja usunie dotychczasowe zawartości komórek i ich formatowanie. Czy na pewno chcesz kontynuować?')
+        if res == True:
+            self.columns = int(self.basicSc.get())
+            self.rows = int(self.basicSr.get())
+            self.mainFrame = self.createCellFrame()
+            self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
     # endregion
 
     #region Funkcja - scalanie komórek
