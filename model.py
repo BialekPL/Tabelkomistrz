@@ -89,6 +89,7 @@ class Table:
 
     def setHeight(self, x):
         self.__height = x
+        print(self.__height)
 
     def setWidth(self, x):
         self.__width = x

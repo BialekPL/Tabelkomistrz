@@ -199,6 +199,7 @@ class View():
             self.rows = int(self.basicSr.get())
             self.mainFrame = self.createCellFrame()
             self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+            self.controller.changeTableSize(int(self.basicSr.get()), int(self.basicSc.get()))
     # endregion
 
     #region Funkcja - scalanie komórek
