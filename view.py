@@ -3,57 +3,10 @@ from tkinter.ttk import Notebook
 from tkinter import Grid, messagebox
 import string
 
-class App():
-    #region Funkcja - tworzenie siatki komórek
-    def createCellFrame(self):
-        self.mainFrame = tk.Frame(self.root)
-        self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
-
-        self.mainCanvas = tk.Canvas(self.mainFrame)
-        self.mainCanvas.grid(row=0, column=0)
-
-        self.mainSvertical = tk.Scrollbar(self.mainFrame, orient='vertical', command=self.mainCanvas.yview)
-        self.mainSvertical.grid(row=0,column=1,sticky='ns')
-        self.mainCanvas.configure(yscrollcommand=self.mainSvertical.set)
-
-        self.mainShorizontal = tk.Scrollbar(self.mainFrame, orient='horizontal', command=self.mainCanvas.xview)
-        self.mainShorizontal.grid(row=1, column=0, sticky='ew')
-        self.mainCanvas.configure(xscrollcommand=self.mainShorizontal.set)
-
-        # listy indexów komórek wyświetlane nad siatką i po lewej stronie siatki
-        self.cellFrame = tk.Frame(self.mainCanvas)
-
-        rowIndex = [i for i in range(0,self.rows,1)]
-        columnIndex = list(string.ascii_uppercase)
-        for i in range(self.columns):
-            columnIndex[i] = tk.Label(self.cellFrame, text=f'{columnIndex[i]}', width=17)
-            columnIndex[i].grid(row=0, column=i+1, sticky='news')
-
-        for i in range(self.rows):
-            rowIndex[i] = tk.Label(self.cellFrame, text=f'{rowIndex[i]}')
-            rowIndex[i].grid(column=0, row=i+1, sticky='news')
-
-        # siatka komórek edytowalnych
-        cells = [["" for i in range(self.columns)] for j in range(self.rows)]
-        for i in range(self.rows):
-            for j in range(self.columns):
-                cells[i][j] = tk.Text(self.cellFrame, width=15, height=1)
-                cells[i][j].grid(row=i+1, column=j+1,sticky='news')
-
-        self.mainCanvas.create_window((0,0), window=self.cellFrame, anchor='nw')
-        self.cellFrame.update_idletasks()
-        bbox=self.mainCanvas.bbox('all')
-
-        # w,h = bbox[2]-bbox[1], bbox[3]-bbox[1]
-        dw, dh = int(127 * self.vis_cols), int(25 * self.vis_rows)
-        self.mainCanvas.configure(scrollregion=bbox, width=dw, height=dh)
-
-        return self.mainFrame
-    #endregion
-
+class View():
     def __init__(self,master):
         self.root = master
-
+        self.controller = None
         #region rozmiary itp.
         self.rows = 30      #liczba rzędów komórek
         self.columns = 15   #liczba kolumn komórek
@@ -191,6 +144,52 @@ class App():
         self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
         #endregion
     
+        #region Funkcja - tworzenie siatki komórek
+    def createCellFrame(self):
+        self.mainFrame = tk.Frame(self.root)
+        self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+
+        self.mainCanvas = tk.Canvas(self.mainFrame)
+        self.mainCanvas.grid(row=0, column=0)
+
+        self.mainSvertical = tk.Scrollbar(self.mainFrame, orient='vertical', command=self.mainCanvas.yview)
+        self.mainSvertical.grid(row=0,column=1,sticky='ns')
+        self.mainCanvas.configure(yscrollcommand=self.mainSvertical.set)
+
+        self.mainShorizontal = tk.Scrollbar(self.mainFrame, orient='horizontal', command=self.mainCanvas.xview)
+        self.mainShorizontal.grid(row=1, column=0, sticky='ew')
+        self.mainCanvas.configure(xscrollcommand=self.mainShorizontal.set)
+
+        # listy indexów komórek wyświetlane nad siatką i po lewej stronie siatki
+        self.cellFrame = tk.Frame(self.mainCanvas)
+
+        rowIndex = [i for i in range(0,self.rows,1)]
+        columnIndex = list(string.ascii_uppercase)
+        for i in range(self.columns):
+            columnIndex[i] = tk.Label(self.cellFrame, text=f'{columnIndex[i]}', width=17)
+            columnIndex[i].grid(row=0, column=i+1, sticky='news')
+
+        for i in range(self.rows):
+            rowIndex[i] = tk.Label(self.cellFrame, text=f'{rowIndex[i]}')
+            rowIndex[i].grid(column=0, row=i+1, sticky='news')
+
+        # siatka komórek edytowalnych
+        self.cells = [["" for i in range(self.columns)] for j in range(self.rows)]
+        for i in range(self.rows):
+            for j in range(self.columns):
+                self.cells[i][j] = tk.Text(self.cellFrame, width=15, height=1)
+                self.cells[i][j].grid(row=i+1, column=j+1,sticky='news')
+
+        self.mainCanvas.create_window((0,0), window=self.cellFrame, anchor='nw')
+        self.cellFrame.update_idletasks()
+        bbox=self.mainCanvas.bbox('all')
+
+        # w,h = bbox[2]-bbox[1], bbox[3]-bbox[1]
+        dw, dh = int(127 * self.vis_cols), int(25 * self.vis_rows)
+        self.mainCanvas.configure(scrollregion=bbox, width=dw, height=dh)
+
+        return self.mainFrame
+    #endregion
 
     #region Funkcja - zminana rozmiaru siatki
     def basicSizeButton(self):
@@ -204,10 +203,11 @@ class App():
 
     #region Funkcja - scalanie komórek
     def mergeCells(self):
-        text = self.editEmerge.get().split(',')
-        text = [i.upper() for i in text]
-        for i in text:
-            print("scalane komórki: ",i[0]," ",int(i[1]))
+        print('mergeCells button')
+        # text = self.editEmerge.get().split(',')
+        # text = [i.upper() for i in text]
+        # for i in text:
+        #     print("scalane komórki: ",i[0]," ",int(i[1]))
         
         #sprawdzić czy poprawnie wpisane komórki
 
@@ -216,19 +216,16 @@ class App():
         #sprawdzić czy są scalane rzędami czy kolumnami
 
         #łącznie komórek w wierszu
-        # cells[0][4] = tk.Text(cellFrame,width=15,height=1)
-        # cells[0][4].grid(row=1, column=5, columnspan=2, sticky='news')
+        # self.cells[0][4] = tk.Text(self.cellFrame,width=15,height=1)
+        # self.cells[0][4].grid(row=1, column=5, columnspan=2, sticky='news')
         
         #łączenie komórek w kolumnie
-        # cells[0][1] = tk.Text(cellFrame,width=15,height=1)
-        # cells[0][1].grid(row=1, column=2, rowspan=2, sticky='news')
+        # self.cells[0][1] = tk.Text(self.cellFrame,width=15,height=1)
+        # self.cells[0][1].grid(row=1, column=2, rowspan=2, sticky='news')
 
     #endregion
 
-def main():
-    root = tk.Tk()
-    App(root)
-    root.mainloop()
+    def setController(self, controller):
+        self.controller = controller
 
-if __name__ == '__main__':
-    main()
+    
