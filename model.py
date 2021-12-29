@@ -89,9 +89,11 @@ class Table:
 
     def setHeight(self, x):
         self.__height = x
+        self.__init__(self.__height, self.__width)
 
     def setWidth(self, x):
         self.__width = x
+        self.__init__(self.__height, self.__width)
 
     def setMergedCells(self, x): # jak import bd robiony to sie przyda a narazie to raczej nie bardzo
         self.__mergedCells = x 

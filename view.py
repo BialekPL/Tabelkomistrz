@@ -3,6 +3,8 @@ from tkinter.ttk import Notebook
 from tkinter import Grid, messagebox
 import string
 
+from controller import Controller
+
 class View():
     def __init__(self,master):
         self.root = master
@@ -177,7 +179,9 @@ class View():
         self.cells = [["" for i in range(self.columns)] for j in range(self.rows)]
         for i in range(self.rows):
             for j in range(self.columns):
-                self.cells[i][j] = tk.Text(self.cellFrame, width=15, height=1)
+                sv = tk.StringVar()
+                sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+                self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                 self.cells[i][j].grid(row=i+1, column=j+1,sticky='news')
 
         self.mainCanvas.create_window((0,0), window=self.cellFrame, anchor='nw')
@@ -199,6 +203,7 @@ class View():
             self.rows = int(self.basicSr.get())
             self.mainFrame = self.createCellFrame()
             self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+            self.controller.changeTableSize(int(self.basicSr.get()), int(self.basicSc.get()))
     # endregion
 
     #region Funkcja - scalanie komórek
@@ -228,4 +233,20 @@ class View():
     def setController(self, controller):
         self.controller = controller
 
-    
+    def callback(self, *args):
+        '''
+        Daje znać o zmianie tekstu w komórce
+        '''
+        self.controller.getTable(self.returnTable())
+
+    def returnTable(self):
+        '''
+        Funkcja zwracająca tabelkę
+        '''
+        table = []
+        for i in range(self.rows):
+            tmp=[]
+            for j in range(self.columns):
+                tmp.append(self.cells[i][j].get())
+            table.append(tmp)
+        return table
