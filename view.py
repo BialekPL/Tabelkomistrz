@@ -209,13 +209,39 @@ class View():
     #region Funkcja - scalanie komórek
     def mergeCells(self):
         print('mergeCells button')
+        #merge w modelu
         indexStr = self.editEmerge.get().split(',')
         indexStr = [i.upper() for i in indexStr]
         message = self.controller.mergeCells(indexStr)
         if message == 0:
             tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
 
-
+        #merge w view
+        mergedCells = self.controller.getMerged()
+        for merged in mergedCells:
+            #sprawdzanie czy poziomo
+            if merged == [merged[0] + i for i in range(len(merged))]:
+                visible = merged[0]
+                print(visible)
+                #scalanie pierwszego rzędu
+                if (visible >= 0 and visible < self.columns):
+                    content = self.controller.getContent()
+                    sv = tk.StringVar()
+                    sv.set(content[0][visible].getValue())
+                    sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+                    self.cells[0][visible] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
+                    self.cells[0][visible].grid(row=1, column=visible+1, columnspan=len(merged),sticky='news')
+                #reszta
+                else:
+                    content = self.controller.getContent()
+                    sv = tk.StringVar()
+                    #sprawdzanie rzędu
+                    for i in range(self.rows):
+                        if i*self.columns<=visible and visible<i*self.columns+self.columns:
+                            sv.set(content[i][visible%self.columns+1].getValue())
+                            sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+                            self.cells[i][visible%self.columns+1] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
+                            self.cells[i][visible%self.columns+1].grid(row=i+1, column=visible%self.columns+1, columnspan=len(merged),sticky='news')
 
         #text = self.editEmerge.get().split(',')
         #text = [i.upper() for i in text]

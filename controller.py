@@ -24,3 +24,9 @@ class Controller:
         #sprawdzanie czy komórki istnieją
         message = self.table.mergeCells(indexStr)
         return message
+
+    def getMerged(self):
+        return self.table.getMergedCells()
+
+    def getContent(self):
+        return self.table.getContent()
