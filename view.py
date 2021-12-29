@@ -209,11 +209,18 @@ class View():
     #region Funkcja - scalanie komórek
     def mergeCells(self):
         print('mergeCells button')
-        # text = self.editEmerge.get().split(',')
-        # text = [i.upper() for i in text]
-        # for i in text:
+        indexStr = self.editEmerge.get().split(',')
+        indexStr = [i.upper() for i in indexStr]
+        message = self.controller.mergeCells(indexStr)
+        if message == 0:
+            tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
+
+
+
+        #text = self.editEmerge.get().split(',')
+        #text = [i.upper() for i in text]
+        #for i in text:
         #     print("scalane komórki: ",i[0]," ",int(i[1]))
-        
         #sprawdzić czy poprawnie wpisane komórki
 
         #sprawdzić czy komórki mogą być scalone
