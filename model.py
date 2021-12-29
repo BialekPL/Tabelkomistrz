@@ -68,7 +68,7 @@ class Table:
                             position = j
                         else:
                             position = width * i + j
-                        tmp.append(Cell(None, position, alphabet[j]+str(i+1)))
+                        tmp.append(Cell(None, position, alphabet[j]+str(i)))
                     self.__content.append(tmp)
             else:
                 raise ValueError
@@ -121,8 +121,8 @@ class Table:
         x D
         '''
         try:
-            indexStr = indexStr.split(', ')
             cellsIndexes = [cell.getIndex() for i in range(len(self.getContent())) for cell in self.getContent()[i]]
+            print(cellsIndexes)
             for ind in indexStr:
                 if ind not in cellsIndexes:
                     raise ValueError
@@ -151,6 +151,7 @@ class Table:
                             cell.setValue(None) #nwm czy pozostałe komórki ustawiać na zero czy null czy jak 
         except ValueError:
             print('Zły format indeksów/komórki nie da się rozdzielić')
+            return 0
 
     def divideCells(self, index):
         '''
@@ -175,10 +176,10 @@ class Table:
 
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
-#table = Table(3, 3)
-#table.mergeCells('A1, B1')
+table = Table(3, 3)
+table.mergeCells(['A1', 'B1'])
 #print(table.getMergedCells())
 #print(table.getContent()[0][2].setValue(6))
 #print([cell.getIndex() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
 #table.divideCells('A1')
-#print(table.getMergedCells())
+print(table.getMergedCells())
