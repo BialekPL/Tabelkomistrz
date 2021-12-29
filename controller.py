@@ -3,6 +3,8 @@ class Controller:
     def __init__(self, model, view):
         self.table = model
         self.view = view
+        self.table.setHeight(self.view.rows)
+        self.table.setWidth(self.view.columns)
 
     def changeTableSize(self, height, width):
         self.table.setHeight(height)
@@ -17,6 +19,6 @@ class Controller:
                 self.table.getContent()[i][j].setValue(tab[i][j])
                 print(self.table.getContent()[i][j].getValue())
 
-    
+
     #def mergeCells(self, cells):
         
