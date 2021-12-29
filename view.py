@@ -243,6 +243,16 @@ class View():
                             self.cells[i][visible%self.columns+1] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                             self.cells[i][visible%self.columns+1].grid(row=i+1, column=visible%self.columns+1, columnspan=len(merged),sticky='news')
 
+            elif merged == [merged[0] + self.columns * i for i in range(len(merged))]:
+                visible = merged[0]
+                for i in range(self.rows):
+                    if i*self.columns<=visible and visible<i*self.columns+self.columns:
+                        content = self.controller.getContent()
+                        sv = tk.StringVar()
+                        sv.set(content[0][visible].getValue())
+                        sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+                        self.cells[i][visible%self.columns+1] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
+                        self.cells[i][visible%self.columns+1].grid(row=i+1, column=visible%self.columns+1, rowspan=len(merged),sticky='news')
         #text = self.editEmerge.get().split(',')
         #text = [i.upper() for i in text]
         #for i in text:
