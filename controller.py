@@ -1,8 +1,8 @@
-
 class Controller:
     def __init__(self, model, view):
         self.table = model
         self.view = view
+        #self.export = export
         self.table.setHeight(self.view.rows)
         self.table.setWidth(self.view.columns)
 
@@ -12,11 +12,12 @@ class Controller:
         print(height, ' ', width)
 
 
-    def getTable(self, tab):
+    def setTable(self, tab):
         print(self.table.getContent())
         for i in range(len(self.table.getContent())):
             for j in range(len(self.table.getContent()[i])):
                 self.table.getContent()[i][j].setValue(tab[i][j])
+                self.table.nullIfMerged()
                 print(self.table.getContent()[i][j].getValue())
 
 

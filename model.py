@@ -144,11 +144,7 @@ class Table:
                 self.__mergedCells.append(positions)
             else: return 0
 
-            for row in range(len(self.__content)):
-                for cell in self.__content[row]:
-                    if cell.getPosition() in positions:
-                        if cell.getPosition() != positions[0]:
-                            cell.setValue(None) #nwm czy pozostałe komórki ustawiać na zero czy null czy jak 
+            self.nullIfMerged()
         except ValueError:
             print('Zły format indeksów/komórki nie da się rozdzielić')
             return 0
@@ -172,14 +168,21 @@ class Table:
         except ValueError:
             print('Zły index')
 
+    def nullIfMerged(self):
+        for positions in self.getMergedCells():
+            for row in range(len(self.__content)):
+                for cell in self.__content[row]:
+                    if cell.getPosition() in positions and cell.getPosition() != positions[0]:                        
+                        cell.setValue('')
+
 
 
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
 table = Table(3, 3)
 table.mergeCells(['A1', 'B1'])
+table.mergeCells(['A2', 'B2'])
 #print(table.getMergedCells())
 #print(table.getContent()[0][2].setValue(6))
 #print([cell.getIndex() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
 #table.divideCells('A1')
-print(table.getMergedCells())
