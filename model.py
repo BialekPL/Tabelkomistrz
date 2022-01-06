@@ -164,7 +164,7 @@ class Table:
                         if sorted(tmp) == positions:
                             self.__mergedCells.append(positions)
                             self.nullIfMerged()
-                            return 1
+                            return i
             
         except ValueError:
             print('Zły format indeksów/komórki nie da się rozdzielić')
@@ -194,15 +194,15 @@ class Table:
             for row in range(len(self.__content)):
                 for cell in self.__content[row]:
                     if cell.getPosition() in positions and cell.getPosition() != positions[0]:                        
-                        cell.setValue('')
+                        cell.setValue('DZIAŁA')
 
 
 
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
 #table = Table(3, 3)
+#print(table.getContent()[0][0].setValue(6))
 #table.mergeCells(['A0', 'B0', 'C0', 'A1','B1', 'C1'])
 #print(table.getMergedCells())
-#print(table.getContent()[0][2].setValue(6))
-#print([cell.getIndex() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
+#print([cell.getValue() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
 #table.divideCells('A1')
