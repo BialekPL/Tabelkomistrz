@@ -135,16 +135,37 @@ class Table:
             print('Pozycje',positions)
 
             positions = sorted(positions)
+            #scalanie poziome
             if positions == [positions[0] + i for i in range(len(positions))]:
                 if len(positions)<=self.__width:
                     print('Pierwszy warunek działa')
                     self.__mergedCells.append(positions)
+                    self.nullIfMerged()
+                    return 1
+            #scalanie pionowo
             elif positions == [positions[0] + self.__width * i for i in range(len(positions))]:
                 print('Drugi warunek działa')
                 self.__mergedCells.append(positions)
-            else: return 0
-
-            self.nullIfMerged()
+                self.nullIfMerged()
+                return 1
+            #blokowe scalanie np [A1,A2,B1,B2]
+            for i in range(len(positions)):
+                if i!=0:
+                    if len(positions)%i==0:
+                        tmp = []
+                        for j in range(i):
+                            tmp.append(positions[j])
+                        size = len(tmp)
+                        it = 0
+                        while size < len(positions): 
+                            tmp.append(tmp[it]+self.__width)
+                            it = it + 1
+                            size = size + 1
+                        if sorted(tmp) == positions:
+                            self.__mergedCells.append(positions)
+                            self.nullIfMerged()
+                            return 1
+            
         except ValueError:
             print('Zły format indeksów/komórki nie da się rozdzielić')
             return 0
@@ -179,9 +200,8 @@ class Table:
 
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
-table = Table(3, 3)
-table.mergeCells(['A1', 'B1'])
-table.mergeCells(['A2', 'B2'])
+#table = Table(3, 3)
+#table.mergeCells(['A0', 'B0', 'C0', 'A1','B1', 'C1'])
 #print(table.getMergedCells())
 #print(table.getContent()[0][2].setValue(6))
 #print([cell.getIndex() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
