@@ -106,7 +106,7 @@ class View():
         self.editEdev = tk.Entry(self.tabEdit)
         self.editEdev.grid(row=0, column=4,sticky=tk.W)
 
-        self.editBdev = tk.Button(self.tabEdit, text="Rozdziel")
+        self.editBdev = tk.Button(self.tabEdit, text="Rozdziel", command=lambda: self.divideCell())
         self.editBdev.grid(row=0, column=5,sticky=tk.W)
 
         self.editBb = tk.Button(self.tabEdit, text="B")
@@ -211,11 +211,35 @@ class View():
         #merge w modelu
         indexStr = self.editEmerge.get().split(',')
         indexStr = [i.upper() for i in indexStr]
-        message = self.controller.mergeCells(indexStr)
+        if len(indexStr)>1:
+            message = self.controller.mergeCells(indexStr)
+        else:
+            tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
         if message == 0:
             tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
-
+        self.merging(message)
         #merge w view
+        #text = self.editEmerge.get().split(',')
+        #text = [i.upper() for i in text]
+        #for i in text:
+        #     print("scalane komórki: ",i[0]," ",int(i[1]))
+        #sprawdzić czy poprawnie wpisane komórki
+
+        #sprawdzić czy komórki mogą być scalone
+
+        #sprawdzić czy są scalane rzędami czy kolumnami
+
+        #łącznie komórek w wierszu
+        # self.cells[0][4] = tk.Text(self.cellFrame,width=15,height=1)
+        # self.cells[0][4].grid(row=1, column=5, columnspan=2, sticky='news')
+        
+        #łączenie komórek w kolumnie
+        # self.cells[0][1] = tk.Text(self.cellFrame,width=15,height=1)
+        # self.cells[0][1].grid(row=1, column=2, rowspan=2, sticky='news')
+
+    #endregion
+
+    def merging(self, mes):
         mergedCells = self.controller.getMerged()
         for merged in mergedCells:
             #sprawdzanie czy poziomo
@@ -263,28 +287,9 @@ class View():
                         sv.set(content[i][visible%self.columns].getValue())
                         sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                         self.cells[i][visible%self.columns] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
-                        rowspanVal = int(len(merged)/message)
-                        colspanVal = message
+                        rowspanVal = int(len(merged)/mes)
+                        colspanVal = mes
                         self.cells[i][visible%self.columns].grid(row=i+1, column=visible%self.columns+1, rowspan=rowspanVal, columnspan=colspanVal,sticky='news')
-        #text = self.editEmerge.get().split(',')
-        #text = [i.upper() for i in text]
-        #for i in text:
-        #     print("scalane komórki: ",i[0]," ",int(i[1]))
-        #sprawdzić czy poprawnie wpisane komórki
-
-        #sprawdzić czy komórki mogą być scalone
-
-        #sprawdzić czy są scalane rzędami czy kolumnami
-
-        #łącznie komórek w wierszu
-        # self.cells[0][4] = tk.Text(self.cellFrame,width=15,height=1)
-        # self.cells[0][4].grid(row=1, column=5, columnspan=2, sticky='news')
-        
-        #łączenie komórek w kolumnie
-        # self.cells[0][1] = tk.Text(self.cellFrame,width=15,height=1)
-        # self.cells[0][1].grid(row=1, column=2, rowspan=2, sticky='news')
-
-    #endregion
 
     def setController(self, controller):
         self.controller = controller
@@ -306,3 +311,33 @@ class View():
                 tmp.append(self.cells[i][j].get())
             table.append(tmp)
         return table
+
+    def divideCell(self):
+        index = self.editEdev.get()
+        print(index)
+        if len(index) == 2:
+            mergedCells = self.controller.dividing(index)
+            #self.mergeCells(mergedCells)
+            self.setNotMerged(mergedCells)
+            
+
+
+    def setNotMerged(self, mergedCells):
+        print(mergedCells)
+        for i in range(self.rows):
+            for j in range(self.columns):
+                if i == 0:
+                    position = j
+                else:
+                    position = self.columns * i + j
+                print(position)
+                if any(position in sub for sub in mergedCells)!=True:
+                    print(position)
+                    content = self.controller.getContent()
+                    sv = tk.StringVar()
+                    sv.set(content[i][j].getValue())
+                    sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+                    self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
+                    self.cells[i][j].grid(row=i+1, column=j+1, columnspan=1, rowspan=1, sticky='news')
+    
+
