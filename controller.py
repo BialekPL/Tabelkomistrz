@@ -31,3 +31,8 @@ class Controller:
 
     def getContent(self):
         return self.table.getContent()
+
+    def dividing(self, index):
+        self.table.divideCells(index)
+        return self.getMerged()
+        

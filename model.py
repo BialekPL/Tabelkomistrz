@@ -68,7 +68,7 @@ class Table:
                             position = j
                         else:
                             position = width * i + j
-                        tmp.append(Cell(None, position, alphabet[j]+str(i)))
+                        tmp.append(Cell('', position, alphabet[j]+str(i)))
                     self.__content.append(tmp)
             else:
                 raise ValueError
@@ -194,7 +194,7 @@ class Table:
             for row in range(len(self.__content)):
                 for cell in self.__content[row]:
                     if cell.getPosition() in positions and cell.getPosition() != positions[0]:                        
-                        cell.setValue('DZIAŁA')
+                        cell.setValue('')
 
 
 
@@ -202,7 +202,9 @@ class Table:
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
 #table = Table(3, 3)
 #print(table.getContent()[0][0].setValue(6))
-#table.mergeCells(['A0', 'B0', 'C0', 'A1','B1', 'C1'])
+#table.mergeCells(['A0', 'A1'])
+#table.mergeCells(['B0', 'B1'])
 #print(table.getMergedCells())
 #print([cell.getValue() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
-#table.divideCells('A1')
+#table.divideCells('A0')
+#print(table.getMergedCells())
