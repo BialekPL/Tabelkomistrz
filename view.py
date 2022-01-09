@@ -3,6 +3,7 @@ from tkinter.ttk import Notebook
 from tkinter import Grid, messagebox
 import string
 from controller import Controller
+import datetime
 
 class View():
     def __init__(self,master):
@@ -75,7 +76,7 @@ class View():
         self.basicBchange = tk.Button(self.tabBasic, text="Zmień", command = lambda: self.basicSizeButton())
         self.basicBchange.grid(row=0, column=5)
 
-        self.basicBtemplate = tk.Button(self.tabBasic, text="Załaduj szablon")
+        self.basicBtemplate = tk.Button(self.tabBasic, text="Załaduj szablon", command = lambda: self.basicLoadTemplate())
         self.basicBtemplate.grid(row=0,column=6,sticky=tk.E)
         #endregion
 
@@ -340,4 +341,200 @@ class View():
                     self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                     self.cells[i][j].grid(row=i+1, column=j+1, columnspan=1, rowspan=1, sticky='news')
     
+    
+    def mergeTemplate(self, indexStr):
+        indexStr = [i.upper() for i in indexStr]
+        if len(indexStr)>1:
+            message = self.controller.mergeCells(indexStr)
+        else:
+            tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
+        if message == 0:
+            tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
+        self.merging(message)
 
+    def basicLoadTemplate(self):    #funkcja ładująca szablony (cz.1)
+        #nowe okienko z wyborem dostępnych szablonów
+        self.newWindow = tk.Toplevel(self.root)
+        self.newWindow.title("Wybór szablonu")
+        self.newWindow.geometry("600x250")
+        self.newWindow.resizable(False, False)
+
+        Grid.rowconfigure(self.newWindow,index=0,weight=1)
+        Grid.rowconfigure(self.newWindow,index=1,weight=1)
+        Grid.rowconfigure(self.newWindow,index=2,weight=1)
+        Grid.rowconfigure(self.newWindow,index=3,weight=1)
+        Grid.rowconfigure(self.newWindow,index=4,weight=1)
+        Grid.rowconfigure(self.newWindow,index=5,weight=1)
+        Grid.rowconfigure(self.newWindow,index=6,weight=1)
+        Grid.rowconfigure(self.newWindow,index=7,weight=1)
+        Grid.columnconfigure(self.newWindow,index=0,weight=1)
+
+        windowLname = tk.Label(self.newWindow,text ="Wybierz szablon:")
+        windowLname.configure(font=(f"{self.usedFont['family']}", 16, 'bold'))
+        windowLname.grid(row=0)
+
+        var = tk.StringVar()
+        var.set('yearCal')
+
+        windowR1 = tk.Radiobutton(self.newWindow, text="Kalendarz roczny ", variable=var, value='yearCal')
+        windowR1.grid(row=1,sticky='w')
+
+        windowR2 = tk.Radiobutton(self.newWindow, text="Kalendarz miesięczny (6 tygodni)", variable=var, value='monCal6')
+        windowR2.grid(row=2,sticky='w')
+
+        windowR3 = tk.Radiobutton(self.newWindow, text="Kalendarz miesięczny (5 tygodni)", variable=var, value='monCal5')
+        windowR3.grid(row=3,sticky='w')
+
+        windowR4 = tk.Radiobutton(self.newWindow, text="Kalendarz miesięczny (4 tygodnie)", variable=var, value='monCal4')
+        windowR4.grid(row=4,sticky='w')
+
+        windowR5 = tk.Radiobutton(self.newWindow, text="Kalendarz dzienny", variable=var, value='dayCal')
+        windowR5.grid(row=5,sticky='w')
+
+        windowBok = tk.Button(self.newWindow,text='Załaduj', command=lambda: self.newWindowButton(var))
+        windowBok.grid(row=7,sticky='we')
+
+    def newWindowButton(self,var): #funkcja ładująca szablony (cz.2)
+        #pobranie zaznaczonej wartości i zamknięcie okienka 
+        self.selectedRbutton = var.get()
+        self.newWindow.destroy()
+
+        #ładowanie wybranego szablonu
+        if self.selectedRbutton=='yearCal':     #jeśli wybrano kalendarz roczny
+            #utworzenie tabeli o odpowiednich wymiarach
+            self.columns = 3
+            self.rows = 13
+            self.mainFrame = self.createCellFrame()
+            self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+            self.controller.changeTableSize(int(self.rows), int(self.columns))
+
+            #informacja dla modelu, które komórki są scalone
+            lettersAC = list(string.ascii_uppercase)[:3]
+            self.mergeTemplate([f'{i}0' for i in lettersAC])
+            for i in range(2,12,3):
+                for j in range(3):
+                    self.mergeTemplate([f'{lettersAC[j]}{i}',f'{lettersAC[j]}{i+1}'])
+
+            #wypełnienie tabeli i scalanie komórek
+            sv = tk.StringVar()
+            sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+            sv.set(datetime.date.today().year)
+            # self.cells[0][0] = tk.Entry(self.cellFrame,width=15, textvariable=sv, justify='center')
+            self.cells[0][0] = tk.Entry(self.cellFrame,width=15, textvariable=sv)
+            self.cells[0][0].grid(row=1, column=1, columnspan=4, sticky='news')
+
+            monthNames = ['Styczeń', 'Luty', 'Marzec',
+                        'Kwiecień', 'Maj', 'Czerwiec',
+                        'Lipiec', 'Sierpień', 'Wrzesień',
+                        'Październik', 'Listopad', 'Grudzień']
+            iter = 0
+            for i in range(1,12,3):
+                for j in range(3):
+                    sv = tk.StringVar()
+                    sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+                    # self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv, justify='center')
+                    self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
+                    self.cells[i][j].grid(row=i+1, column=j+1, columnspan=1, sticky='news')
+                    sv.set(monthNames[iter])
+
+                    iter += 1
+                    sv1 = tk.StringVar()
+                    sv1.trace("w", lambda name, index, mode, sv1=sv1: self.callback(sv1))
+                    self.cells[i+1][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv1)
+                    self.cells[i+1][j].grid(row=i+2, column=j+1, columnspan=1, rowspan=2, sticky='news')
+
+        #jeśli wybrano kalendarz miesięczny
+        elif self.selectedRbutton=='monCal6' or self.selectedRbutton=='monCal5' or self.selectedRbutton=='monCal4':
+            #określenie ilości tygodni w miesiącu
+            nWeeks = self.selectedRbutton[-1:]
+
+            #utworzenie tabeli o odpowiednich wymiarach
+            self.columns = 7
+            self.rows = int(nWeeks)*3+2 
+            self.mainFrame = self.createCellFrame()
+            self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+            self.controller.changeTableSize(int(self.rows), int(self.columns))
+
+            #informacja dla modelu, które komórki są scalone
+            lettersAG = list(string.ascii_uppercase)[:7]
+            self.mergeTemplate([f'{i}0' for i in lettersAG])
+            for i in range(3,3*int(nWeeks)+1,3):
+                for j in range(0,7):
+                    self.mergeTemplate([f'{lettersAG[j]}{i}',f'{lettersAG[j]}{i+1}'])
+
+            #wypełnienie tabeli i scalanie komórek
+            sv = tk.StringVar()
+            sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+            sv.set("NAZWA MIESIĄCA")
+            # self.cells[0][0] = tk.Entry(self.cellFrame,width=15, textvariable=sv, justify='center')
+            self.cells[0][0] = tk.Entry(self.cellFrame,width=15, textvariable=sv)
+            self.cells[0][0].grid(row=1, column=1, columnspan=7, sticky='news')
+
+            #uzupełnienie dni tygodnia
+            dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']
+            for i in range(len(dayNames)):
+                sv = tk.StringVar()
+                sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+                
+
+                # self.cells[1][i] = tk.Entry(self.cellFrame,width=15, textvariable=sv, justify='center')
+                self.cells[1][i] = tk.Entry(self.cellFrame,width=15, textvariable=sv)
+                self.cells[1][i].grid(row=2, column=i+1, columnspan=1, sticky='news')
+                sv.set(dayNames[i])
+
+            #format komórek z dniami miesiąca
+            for i in range(2,self.rows,3):
+                for j in range(7):
+                    sv1 = tk.StringVar()
+                    sv1.trace("w", lambda name, index, mode, sv1=sv1: self.callback(sv1))
+                    # self.cells[i][j] = tk.Entry(self.cellFrame, width=15, justify='right', textvariable=sv1)
+                    self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv1)
+                    self.cells[i][j].grid(row=i+1, column=j+1, columnspan=1, sticky='news')
+
+                    # self.cells[i+1][j] = tk.Entry(self.cellFrame, width=15, justify='left',textvariable=sv1)
+                    self.cells[i+1][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv1)
+                    self.cells[i+1][j].grid(row=i+2, column=j+1, rowspan=2, sticky='news')
+
+        elif self.selectedRbutton=='dayCal':    #jeśli wybrano kalendarz dzienny
+            #utworzenie tabelki o odpowiednich rozmiarach
+            self.columns = 6
+            self.rows = 19
+            self.mainFrame = self.createCellFrame()
+            self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
+            self.controller.changeTableSize(int(self.rows), int(self.columns))
+
+            #informacja dla modelu, które komórki są scalone
+            self.mergeTemplate(['a0','b0','c0','d0','e0','f0'])
+            for i in range(1,19):
+                self.mergeTemplate([f'b{i}',f'c{i}',f'd{i}',f'e{i}',f'f{i}'])
+
+            #wypełnienie tabeli i scalanie komórek
+            monthNames = ['Styczeń', 'Luty', 'Marzec',
+                        'Kwiecień', 'Maj', 'Czerwiec',
+                        'Lipiec', 'Sierpień', 'Wrzesień',
+                        'Październik', 'Listopad', 'Grudzień']
+            sv = tk.StringVar()
+            sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+            dateToday = f"{datetime.date.today().day} {monthNames[int(datetime.date.today().month)-1]} {datetime.date.today().year}"
+            sv.set(dateToday)
+            # self.cells[0][0] = tk.Entry(self.cellFrame, width=15, textvariable=sv, justify='center')
+            self.cells[0][0] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
+            self.cells[0][0].grid(row=1, column=1, columnspan=6, sticky='news')
+
+            #uzupełnienie godzin
+            hourList = [f"{i}:00" for i in range(6,24)]
+            for i in range(1,self.rows):
+                #wpisanie godzin do odpowiednich komórek
+                sv = tk.StringVar()
+                sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
+                # self.cells[i][0] = tk.Entry(self.cellFrame, width=15, textvariable=sv, justify='center')
+                self.cells[i][0] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
+                self.cells[i][0].grid(row=i+1, column=1, columnspan=1, sticky='news')
+                sv.set(hourList[i-1])
+
+                #ustawienie odpowiedniej szerokości prawej kolumny
+                sv1 = tk.StringVar()
+                sv1.trace("w", lambda name, index, mode, sv1=sv1: self.callback(sv1))
+                self.cells[i][1] = tk.Entry(self.cellFrame, width=15, textvariable=sv1)
+                # self.cells[i][1] = tk.Entry(self.cellFrame, width=15, justify='left', textvariable=sv1)
+                self.cells[i][1].grid(row=i+1, column=2, columnspan=5, sticky='news')
