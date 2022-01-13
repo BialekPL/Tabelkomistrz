@@ -8,6 +8,7 @@ class App(tk.Tk):
         super().__init__()
         view = View(self)
         model = Table(30, 15)
+        #export = Export()
         controller = Controller(model, view)
         view.setController(controller)
 
