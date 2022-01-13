@@ -35,4 +35,8 @@ class Controller:
     def dividing(self, index):
         self.table.divideCells(index)
         return self.getMerged()
-        
+    
+    def exportLatex(self):
+        print(self.table.getMergedCells())
+        print([cell.getIndex() for i in range(len(self.table.getContent())) for cell in self.table.getContent()[i]])
+        #return self.export.generateCode(self.table)
