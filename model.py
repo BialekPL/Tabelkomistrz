@@ -136,36 +136,37 @@ class Table:
 
             positions = sorted(positions)
             #scalanie poziome
-            if positions == [positions[0] + i for i in range(len(positions))]:
-                if len(positions)<=self.__width:
-                    print('Pierwszy warunek działa')
+            if positions not in self.__mergedCells:
+                if positions == [positions[0] + i for i in range(len(positions))]:
+                    if len(positions)<=self.__width:
+                        print('Pierwszy warunek działa')
+                        self.__mergedCells.append(positions)
+                        self.nullIfMerged()
+                        return 1
+                #scalanie pionowo
+                elif positions == [positions[0] + self.__width * i for i in range(len(positions))]:
+                    print('Drugi warunek działa')
                     self.__mergedCells.append(positions)
                     self.nullIfMerged()
                     return 1
-            #scalanie pionowo
-            elif positions == [positions[0] + self.__width * i for i in range(len(positions))]:
-                print('Drugi warunek działa')
-                self.__mergedCells.append(positions)
-                self.nullIfMerged()
-                return 1
-            #blokowe scalanie np [A1,A2,B1,B2]
-            for i in range(len(positions)):
-                if i!=0:
-                    if len(positions)%i==0:
-                        tmp = []
-                        for j in range(i):
-                            tmp.append(positions[j])
-                        size = len(tmp)
-                        it = 0
-                        while size < len(positions): 
-                            tmp.append(tmp[it]+self.__width)
-                            it = it + 1
-                            size = size + 1
-                        if sorted(tmp) == positions:
-                            self.__mergedCells.append(positions)
-                            self.nullIfMerged()
-                            return i
-            
+                #blokowe scalanie np [A1,A2,B1,B2]
+                for i in range(len(positions)):
+                    if i!=0:
+                        if len(positions)%i==0:
+                            tmp = []
+                            for j in range(i):
+                                tmp.append(positions[j])
+                            size = len(tmp)
+                            it = 0
+                            while size < len(positions): 
+                                tmp.append(tmp[it]+self.__width)
+                                it = it + 1
+                                size = size + 1
+                            if sorted(tmp) == positions:
+                                self.__mergedCells.append(positions)
+                                self.nullIfMerged()
+                                return i
+            else: return 0
         except ValueError:
             print('Zły format indeksów/komórki nie da się rozdzielić')
             return 0
