@@ -9,6 +9,8 @@ class View():
     def __init__(self,master):
         self.root = master
         self.controller = None
+        self.lastClickedi = None  #style
+        self.lastClickedj = None
         #region rozmiary itp.
         self.rows = 30      #liczba rzędów komórek
         self.columns = 15   #liczba kolumn komórek
@@ -20,8 +22,11 @@ class View():
         self.root.geometry("950x510")       #rozmiar głównego okna (szer x wys)
         self.root.title("Tabelkomistrz")    #nazwa/tytuł okna głónego
         self.root.resizable(False, False)   #uniemożliwnie zmiany rozmiaru okna głównego
-        self.usedFont = {'family': 'Segoe UI', 'size': 9, 'weight': 'normal', 'slant': 'italic', 'underline': 0, 'overstrike': 0}
-        
+        self.usedFont = {'family': 'Segoe UI', 'size': 9, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0} #style
+        #wieght: bold, normal
+        #slant: italic, roman
+        #underline: 1(underlined), 0(normal)
+
         Grid.rowconfigure(self.root,index=0,weight=1)
         Grid.rowconfigure(self.root,index=1,weight=10)
         Grid.columnconfigure(self.root,index=0,weight=1)
@@ -110,15 +115,15 @@ class View():
         self.editBdev = tk.Button(self.tabEdit, text="Rozdziel", command=lambda: self.divideCell())
         self.editBdev.grid(row=0, column=5,sticky=tk.W)
 
-        self.editBb = tk.Button(self.tabEdit, text="B")
+        self.editBb = tk.Button(self.tabEdit, text="B", command=lambda: self.setStyle('bold'))
         self.editBb.configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold'))
         self.editBb.grid(row=0, column=6,sticky=tk.E)
 
-        self.editBi = tk.Button(self.tabEdit, text="I")
+        self.editBi = tk.Button(self.tabEdit, text="I", command=lambda: self.setStyle('italic'))
         self.editBi.configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'italic'))
         self.editBi.grid(row=0, column=7,sticky=tk.E)
 
-        self.editBu = tk.Button(self.tabEdit,text="U")
+        self.editBu = tk.Button(self.tabEdit,text="U", command=lambda: self.setStyle('underlined'))
         self.editBu.configure(underline=0)
         self.editBu.grid(row=0, column=8,sticky=tk.E)
         #endregion
@@ -146,6 +151,15 @@ class View():
         self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
         #endregion
     
+    def onClick(self, row, col): #style!
+        self.lastClickedi = row
+        self.lastClickedj = col
+        print("clicked: ", self.lastClickedi, self.lastClickedj)
+        
+    def setStyle(self, styleStr):
+        print("style:", styleStr, " ",self.lastClickedi, self.lastClickedj)
+        self.controller.setStyle(styleStr, self.lastClickedi, self.lastClickedj)
+
         #region Funkcja - tworzenie siatki komórek
     def createCellFrame(self):
         self.mainFrame = tk.Frame(self.root)
@@ -183,6 +197,7 @@ class View():
                 sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                 self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                 self.cells[i][j].grid(row=i+1, column=j+1,sticky='news')
+                self.cells[i][j].bind("<1>", lambda event, row=i, col=j: self.onClick(row,col)) #style!
 
         self.mainCanvas.create_window((0,0), window=self.cellFrame, anchor='nw')
         self.cellFrame.update_idletasks()
@@ -320,8 +335,6 @@ class View():
             mergedCells = self.controller.dividing(index)
             #self.mergeCells(mergedCells)
             self.setNotMerged(mergedCells)
-            
-
 
     def setNotMerged(self, mergedCells):
         print(mergedCells)
@@ -340,7 +353,6 @@ class View():
                     sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                     self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                     self.cells[i][j].grid(row=i+1, column=j+1, columnspan=1, rowspan=1, sticky='news')
-    
     
     def mergeTemplate(self, indexStr):
         indexStr = [i.upper() for i in indexStr]
@@ -476,7 +488,6 @@ class View():
                 sv = tk.StringVar()
                 sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                 
-
                 # self.cells[1][i] = tk.Entry(self.cellFrame,width=15, textvariable=sv, justify='center')
                 self.cells[1][i] = tk.Entry(self.cellFrame,width=15, textvariable=sv)
                 self.cells[1][i].grid(row=2, column=i+1, columnspan=1, sticky='news')

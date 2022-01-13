@@ -10,7 +10,7 @@ class Cell:
         self.__position = position
         self.__index = index #indeks typu A1, B5, nie chce usuwać pozycji bo łatwiej się z nich korzysta np przy mergowaniu 
         self.__mergedWith = []
-        self.__styles = {'bold':0, 'cursive':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
+        self.__styles = {'bold':0, 'italic':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
 
     def getValue(self):
         return self.__value
