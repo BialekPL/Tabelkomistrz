@@ -196,7 +196,8 @@ class Table:
                     if cell.getPosition() in positions and cell.getPosition() != positions[0]:                        
                         cell.setValue('')
 
-
+    def setStyle(self, key, i, j):
+        self.__content[i][j].setStyle(key)
 
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
