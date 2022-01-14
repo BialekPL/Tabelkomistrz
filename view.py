@@ -159,7 +159,23 @@ class View():
     def setStyle(self, styleStr):
         print("style:", styleStr, " ",self.lastClickedi, self.lastClickedj)
         self.controller.setStyle(styleStr, self.lastClickedi, self.lastClickedj)
-
+        cellStyle = self.controller.getStyle(self.lastClickedi, self.lastClickedj)
+        if cellStyle['bold']==1 and cellStyle['italic']==0 and cellStyle['underlined']==0:
+            self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold'))
+        elif cellStyle['bold']==1 and cellStyle['italic']==1 and cellStyle['underlined']==0:
+            self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'italic'))
+        elif cellStyle['bold']==1 and cellStyle['italic']==0 and cellStyle['underlined']==1:
+            self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'underline'))
+        elif cellStyle['bold']==1 and cellStyle['italic']==1 and cellStyle['underlined']==1:
+            self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'italic', 'underline'))
+        elif cellStyle['bold']==0 and cellStyle['italic']==1 and cellStyle['underlined']==0:
+            self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'italic'))
+        elif cellStyle['bold']==0 and cellStyle['italic']==0 and cellStyle['underlined']==1:
+            self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'underline'))
+        elif cellStyle['bold']==0 and cellStyle['italic']==1 and cellStyle['underlined']==1:
+            self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'italic', 'underline'))
+        elif cellStyle['bold']==0 and cellStyle['italic']==0 and cellStyle['underlined']==0:
+            self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman'))
         #region Funkcja - tworzenie siatki komórek
     def createCellFrame(self):
         self.mainFrame = tk.Frame(self.root)

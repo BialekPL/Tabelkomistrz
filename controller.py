@@ -43,3 +43,6 @@ class Controller:
 
     def setStyle(self, styleStr,i , j):
         self.table.setStyle(styleStr, i, j)
+
+    def getStyle(self, i, j):
+        return self.table.getCellStyle(i,j)

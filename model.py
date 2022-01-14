@@ -199,7 +199,10 @@ class Table:
 
     def setStyle(self, key, i, j):
         self.__content[i][j].setStyle(key)
+        print([cell.getStyles() for i in range(len(self.getContent())) for cell in self.getContent()[i]])
 
+    def getCellStyle(self, i, j):
+        return self.__content[i][j].getStyles()
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
 #table = Table(3, 3)
