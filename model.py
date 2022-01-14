@@ -10,7 +10,7 @@ class Cell:
         self.__position = position
         self.__index = index #indeks typu A1, B5, nie chce usuwać pozycji bo łatwiej się z nich korzysta np przy mergowaniu 
         self.__mergedWith = []
-        self.__styles = {'bold':0, 'cursive':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
+        self.__styles = {'bold':0, 'italic':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
 
     def getValue(self):
         return self.__value
@@ -136,36 +136,37 @@ class Table:
 
             positions = sorted(positions)
             #scalanie poziome
-            if positions == [positions[0] + i for i in range(len(positions))]:
-                if len(positions)<=self.__width:
-                    print('Pierwszy warunek działa')
+            if positions not in self.__mergedCells:
+                if positions == [positions[0] + i for i in range(len(positions))]:
+                    if len(positions)<=self.__width:
+                        print('Pierwszy warunek działa')
+                        self.__mergedCells.append(positions)
+                        self.nullIfMerged()
+                        return 1
+                #scalanie pionowo
+                elif positions == [positions[0] + self.__width * i for i in range(len(positions))]:
+                    print('Drugi warunek działa')
                     self.__mergedCells.append(positions)
                     self.nullIfMerged()
                     return 1
-            #scalanie pionowo
-            elif positions == [positions[0] + self.__width * i for i in range(len(positions))]:
-                print('Drugi warunek działa')
-                self.__mergedCells.append(positions)
-                self.nullIfMerged()
-                return 1
-            #blokowe scalanie np [A1,A2,B1,B2]
-            for i in range(len(positions)):
-                if i!=0:
-                    if len(positions)%i==0:
-                        tmp = []
-                        for j in range(i):
-                            tmp.append(positions[j])
-                        size = len(tmp)
-                        it = 0
-                        while size < len(positions): 
-                            tmp.append(tmp[it]+self.__width)
-                            it = it + 1
-                            size = size + 1
-                        if sorted(tmp) == positions:
-                            self.__mergedCells.append(positions)
-                            self.nullIfMerged()
-                            return i
-            
+                #blokowe scalanie np [A1,A2,B1,B2]
+                for i in range(len(positions)):
+                    if i!=0:
+                        if len(positions)%i==0:
+                            tmp = []
+                            for j in range(i):
+                                tmp.append(positions[j])
+                            size = len(tmp)
+                            it = 0
+                            while size < len(positions): 
+                                tmp.append(tmp[it]+self.__width)
+                                it = it + 1
+                                size = size + 1
+                            if sorted(tmp) == positions:
+                                self.__mergedCells.append(positions)
+                                self.nullIfMerged()
+                                return i
+            else: return 0
         except ValueError:
             print('Zły format indeksów/komórki nie da się rozdzielić')
             return 0
@@ -198,7 +199,10 @@ class Table:
 
     def setStyle(self, key, i, j):
         self.__content[i][j].setStyle(key)
+        print([cell.getStyles() for i in range(len(self.getContent())) for cell in self.getContent()[i]])
 
+    def getCellStyle(self, i, j):
+        return self.__content[i][j].getStyles()
 
 #Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
 #table = Table(3, 3)

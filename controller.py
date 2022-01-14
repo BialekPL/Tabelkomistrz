@@ -40,3 +40,9 @@ class Controller:
         print(self.table.getMergedCells())
         print([cell.getIndex() for i in range(len(self.table.getContent())) for cell in self.table.getContent()[i]])
         #return self.export.generateCode(self.table)
+
+    def setStyle(self, styleStr,i , j):
+        self.table.setStyle(styleStr, i, j)
+
+    def getStyle(self, i, j):
+        return self.table.getCellStyle(i,j)
