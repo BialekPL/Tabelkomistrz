@@ -38,6 +38,31 @@ def test_cell_setIndex(new_index):
 def test_cell_setStyle(key, value):
     cell = model.Cell(0, 0, 'A4')
     cell.setStyle(key)
-    assert cell.getStyles[key] == value
+    assert cell.getStyles()[key] == value
 
 # Tests for Table class
+
+@pytest.mark.parametrize('height, width', [(100, 25), (20, 10)])
+def test_table_init(height, width):
+    table = model.Table(height, width)
+    assert table.getHeight() == height
+    assert table.getWidth() == width
+
+@pytest.mark.parametrize('height, width', [(100, 27)])
+def test_table_init_too_wide(height, width):
+    table = model.Table(height, width)
+    assert table.getWidth != width
+
+@pytest.mark.parametrize('indexes,expected', 
+[
+    (['A1', 'A2'], [[10,20]]),
+    (['A1', 'B1', 'C1'],[[10,11,12]]),
+    (['A1', 'A2', 'B1', 'B2'],[[10,11,20,21]])
+])
+def test_table_merged_cells(indexes, expected):
+    table = model.Table(10, 10)
+    table.mergeCells(indexes)
+    assert table.getMergedCells() == expected
+
+
+
