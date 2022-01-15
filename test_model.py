@@ -64,5 +64,14 @@ def test_table_merged_cells(indexes, expected):
     table.mergeCells(indexes)
     assert table.getMergedCells() == expected
 
+@pytest.mark.parametrize('toMerge,toDivide,expected', [
+    (['A1', 'A2'], 'A1', []),
+])
+def test_table_divide_cells(toMerge, toDivide, expected):
+    table = model.Table(10, 10)
+    table.mergeCells(toMerge)
+    table.divideCells(toDivide)
+    assert table.getMergedCells() == expected
 
-
+# todo 100% coverage na podstawie raportu 
+# pytest --cov --cov-report html
