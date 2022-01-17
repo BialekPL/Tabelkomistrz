@@ -119,7 +119,7 @@ class View():
         self.editBb.configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold'))
         self.editBb.grid(row=0, column=6,sticky=tk.E)
 
-        self.editBi = tk.Button(self.tabEdit, text="I", command=lambda: self.setStyle('italic'))
+        self.editBi = tk.Button(self.tabEdit, text="I", command=lambda: self.setStyle('cursive'))
         self.editBi.configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'italic'))
         self.editBi.grid(row=0, column=7,sticky=tk.E)
 
@@ -160,21 +160,21 @@ class View():
         print("style:", styleStr, " ",self.lastClickedi, self.lastClickedj)
         self.controller.setStyle(styleStr, self.lastClickedi, self.lastClickedj)
         cellStyle = self.controller.getStyle(self.lastClickedi, self.lastClickedj)
-        if cellStyle['bold']==1 and cellStyle['italic']==0 and cellStyle['underlined']==0:
+        if cellStyle['bold']==1 and cellStyle['cursive']==0 and cellStyle['underlined']==0:
             self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold'))
-        elif cellStyle['bold']==1 and cellStyle['italic']==1 and cellStyle['underlined']==0:
+        elif cellStyle['bold']==1 and cellStyle['cursive']==1 and cellStyle['underlined']==0:
             self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'italic'))
-        elif cellStyle['bold']==1 and cellStyle['italic']==0 and cellStyle['underlined']==1:
+        elif cellStyle['bold']==1 and cellStyle['cursive']==0 and cellStyle['underlined']==1:
             self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'underline'))
-        elif cellStyle['bold']==1 and cellStyle['italic']==1 and cellStyle['underlined']==1:
+        elif cellStyle['bold']==1 and cellStyle['cursive']==1 and cellStyle['underlined']==1:
             self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'italic', 'underline'))
-        elif cellStyle['bold']==0 and cellStyle['italic']==1 and cellStyle['underlined']==0:
+        elif cellStyle['bold']==0 and cellStyle['cursive']==1 and cellStyle['underlined']==0:
             self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'italic'))
-        elif cellStyle['bold']==0 and cellStyle['italic']==0 and cellStyle['underlined']==1:
+        elif cellStyle['bold']==0 and cellStyle['cursive']==0 and cellStyle['underlined']==1:
             self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'underline'))
-        elif cellStyle['bold']==0 and cellStyle['italic']==1 and cellStyle['underlined']==1:
+        elif cellStyle['bold']==0 and cellStyle['cursive']==1 and cellStyle['underlined']==1:
             self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'italic', 'underline'))
-        elif cellStyle['bold']==0 and cellStyle['italic']==0 and cellStyle['underlined']==0:
+        elif cellStyle['bold']==0 and cellStyle['cursive']==0 and cellStyle['underlined']==0:
             self.cells[self.lastClickedi][self.lastClickedj].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman'))
         #region Funkcja - tworzenie siatki komórek
     def createCellFrame(self):
@@ -286,6 +286,7 @@ class View():
                     sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                     self.cells[0][visible] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                     self.cells[0][visible].grid(row=1, column=visible+1, columnspan=len(merged),sticky='news')
+                    self.styling(i,visible)
                 #reszta
                 else:
                     content = self.controller.getContent()
@@ -298,6 +299,7 @@ class View():
                             sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                             self.cells[i][visible%self.columns] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                             self.cells[i][visible%self.columns].grid(row=i+1, column=visible%self.columns+1, columnspan=len(merged),sticky='news')
+                            self.styling(i,visible%self.columns)
 
             elif merged == [merged[0] + self.columns * i for i in range(len(merged))]:
                 visible = merged[0]
@@ -309,6 +311,7 @@ class View():
                         sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                         self.cells[i][visible%self.columns] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                         self.cells[i][visible%self.columns].grid(row=i+1, column=visible%self.columns+1, rowspan=len(merged),sticky='news')
+                        self.styling(i,visible%self.columns)
             
             else:
                 visible = merged[0]
@@ -322,6 +325,7 @@ class View():
                         rowspanVal = int(len(merged)/mes)
                         colspanVal = mes
                         self.cells[i][visible%self.columns].grid(row=i+1, column=visible%self.columns+1, rowspan=rowspanVal, columnspan=colspanVal,sticky='news')
+                        self.styling(i,visible%self.columns)
 
     def setController(self, controller):
         self.controller = controller
@@ -369,6 +373,7 @@ class View():
                     sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                     self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                     self.cells[i][j].grid(row=i+1, column=j+1, columnspan=1, rowspan=1, sticky='news')
+                    self.styling(i,j)
     
     def mergeTemplate(self, indexStr):
         indexStr = [i.upper() for i in indexStr]
@@ -565,3 +570,22 @@ class View():
                 self.cells[i][1] = tk.Entry(self.cellFrame, width=15, textvariable=sv1)
                 # self.cells[i][1] = tk.Entry(self.cellFrame, width=15, justify='left', textvariable=sv1)
                 self.cells[i][1].grid(row=i+1, column=2, columnspan=5, sticky='news')
+
+    def styling(self, i, j):
+        cellStyle = self.controller.getStyle(i, j)
+        if cellStyle['bold']==1 and cellStyle['cursive']==0 and cellStyle['underlined']==0:
+            self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold'))
+        elif cellStyle['bold']==1 and cellStyle['cursive']==1 and cellStyle['underlined']==0:
+            self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'italic'))
+        elif cellStyle['bold']==1 and cellStyle['cursive']==0 and cellStyle['underlined']==1:
+            self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'underline'))
+        elif cellStyle['bold']==1 and cellStyle['cursive']==1 and cellStyle['underlined']==1:
+            self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'bold', 'italic', 'underline'))
+        elif cellStyle['bold']==0 and cellStyle['cursive']==1 and cellStyle['underlined']==0:
+            self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'italic'))
+        elif cellStyle['bold']==0 and cellStyle['cursive']==0 and cellStyle['underlined']==1:
+            self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'underline'))
+        elif cellStyle['bold']==0 and cellStyle['cursive']==1 and cellStyle['underlined']==1:
+            self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'italic', 'underline'))
+        elif cellStyle['bold']==0 and cellStyle['cursive']==0 and cellStyle['underlined']==0:
+            self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman'))

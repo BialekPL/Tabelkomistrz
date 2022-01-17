@@ -1,8 +1,10 @@
+import copy
+
 class Controller:
-    def __init__(self, model, view):
+    def __init__(self, model, view, export):
         self.table = model
         self.view = view
-        #self.export = export
+        self.export = export
         self.table.setHeight(self.view.rows)
         self.table.setWidth(self.view.columns)
 
@@ -34,12 +36,14 @@ class Controller:
 
     def dividing(self, index):
         self.table.divideCells(index)
+        print(self.getMerged())
         return self.getMerged()
     
     def exportLatex(self):
         print(self.table.getMergedCells())
         print([cell.getIndex() for i in range(len(self.table.getContent())) for cell in self.table.getContent()[i]])
-        #return self.export.generateCode(self.table)
+        tableToExport = copy.copy(self.table)
+        return self.export.generateCode(tableToExport)
 
     def setStyle(self, styleStr,i , j):
         self.table.setStyle(styleStr, i, j)
