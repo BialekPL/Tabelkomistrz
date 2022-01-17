@@ -1,3 +1,5 @@
+import copy
+
 class Cell:
     '''
     Klasa odzwierciedlająca komórki zawiera indeks
@@ -10,7 +12,7 @@ class Cell:
         self.__position = position
         self.__index = index #indeks typu A1, B5, nie chce usuwać pozycji bo łatwiej się z nich korzysta np przy mergowaniu 
         self.__mergedWith = []
-        self.__styles = {'bold':0, 'italic':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
+        self.__styles = {'bold':0, 'cursive':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
 
     def getValue(self):
         return self.__value
@@ -41,6 +43,9 @@ class Cell:
             self.__styles[key] = 0
         else:
             self.__styles[key] = 1
+
+    def resetStyles(self):
+        self.__styles = {'bold':0, 'cursive':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
 
 #wsm tabela mogłaby być singletonem ale aż tak dużo sie u nas nie dzieje więc nwm czy jest większy sens :v
 class Table:
@@ -196,6 +201,8 @@ class Table:
                 for cell in self.__content[row]:
                     if cell.getPosition() in positions and cell.getPosition() != positions[0]:                        
                         cell.setValue('')
+                        cell.resetStyles()
+                
 
     def setStyle(self, key, i, j):
         self.__content[i][j].setStyle(key)
