@@ -139,7 +139,7 @@ class View():
 
         self.impexpLimp = tk.Label(self.tabImpExp, text="Eksport do LaTeX: ")
         self.impexpLimp.grid(row=0, column=0,sticky=tk.W)
-        self.impexpBimp = tk.Button(self.tabImpExp, text="Eksportuj", command=lambda: self.controller.exportLatex())
+        self.impexpBimp = tk.Button(self.tabImpExp, text="Eksportuj", command=lambda: self.exportLatex())
         self.impexpBimp.grid(row=0, column=1,sticky=tk.W)
         #endregion
 
@@ -564,3 +564,7 @@ class View():
             self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman', 'italic', 'underline'))
         elif cellStyle['bold']==0 and cellStyle['cursive']==0 and cellStyle['underlined']==0:
             self.cells[i][j].configure(font=(f"{self.usedFont['family']}", self.usedFont['size'], 'roman'))
+
+    def exportLatex(self):
+        self.controller.exportLatex()
+        messagebox.showinfo(title='Eksport przeprowadzony pomyślnie', message='Tabela została wyeksportowana w formacie Latex do pliku export.txt')
