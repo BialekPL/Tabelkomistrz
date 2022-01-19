@@ -53,7 +53,7 @@ class View():
 
         self.tabsPanel.add(self.tabBasic, text='Podstawowe')
         self.tabsPanel.add(self.tabEdit, text='Edytuj')
-        self.tabsPanel.add(self.tabImpExp, text='Import/Eksport')
+        self.tabsPanel.add(self.tabImpExp, text='Eksport')
         #endregion
 
         #region Zawartość zakładki "Podstawowe"
@@ -141,11 +141,6 @@ class View():
         self.impexpLimp.grid(row=0, column=0,sticky=tk.W)
         self.impexpBimp = tk.Button(self.tabImpExp, text="Eksportuj", command=lambda: self.controller.exportLatex())
         self.impexpBimp.grid(row=0, column=1,sticky=tk.W)
-
-        self.impexpLexp = tk.Label(self.tabImpExp, text="Import tabeli z LaTeX: ")
-        self.impexpLexp.grid(row=0, column=2,sticky=tk.E)
-        self.impexpBexp = tk.Button(self.tabImpExp, text="Importuj")
-        self.impexpBexp.grid(row=0, column=3,sticky=tk.E)
         #endregion
 
         #region Siatka z komórkami
@@ -244,11 +239,12 @@ class View():
         indexStr = [i.upper() for i in indexStr]
         if len(indexStr)>1:
             message = self.controller.mergeCells(indexStr)
+            if message == 0:
+                tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
+            else:
+                self.merging(message)
         else:
             tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
-        if message == 0:
-            tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
-        self.merging(message)
     #endregion
 
     def merging(self, mes):
