@@ -335,7 +335,7 @@ class View():
         Daje znać o zmianie tekstu w komórce
         '''
         self.controller.setTable(self.returnTable())
-        print([cell.getValue() for i in range(len(self.controller.getContent())) for cell in self.controller.getContent()[i]])
+       
 
     def returnTable(self):
         '''
