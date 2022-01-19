@@ -541,10 +541,10 @@ class View():
                 self.mergeTemplate([f'b{i}',f'c{i}',f'd{i}',f'e{i}',f'f{i}'])
 
             #wypełnienie tabeli i scalanie komórek
-            monthNames = ['Styczeń', 'Luty', 'Marzec',
-                        'Kwiecień', 'Maj', 'Czerwiec',
-                        'Lipiec', 'Sierpień', 'Wrzesień',
-                        'Październik', 'Listopad', 'Grudzień']
+            monthNames = ['Stycznia', 'Lutego', 'Marca',
+                        'Kwietnia', 'Maja', 'Czerwca',
+                        'Lipca', 'Sierpnia', 'Września',
+                        'Października', 'Listopada', 'Grudnia']
             sv = tk.StringVar()
             sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
             dateToday = f"{datetime.date.today().day} {monthNames[int(datetime.date.today().month)-1]} {datetime.date.today().year}"
