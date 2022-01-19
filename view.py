@@ -286,7 +286,7 @@ class View():
                     sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
                     self.cells[0][visible] = tk.Entry(self.cellFrame, width=15, textvariable=sv)
                     self.cells[0][visible].grid(row=1, column=visible+1, columnspan=len(merged),sticky='news')
-                    self.styling(i,visible)
+                    self.styling(0,visible)
                 #reszta
                 else:
                     content = self.controller.getContent()
