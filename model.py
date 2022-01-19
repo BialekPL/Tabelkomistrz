@@ -2,16 +2,16 @@ import copy
 
 class Cell:
     '''
-    Klasa odzwierciedlająca komórki zawiera indeks
-    póki co zawiera tylko wartość pozycje i to czy jest scalona
-    mergedWith - lista zawierająca pozycje komórek z którymi owa komórka jest scalona
-    gettery/settery
+    Klasa odzwierciedlająca komórki z których stworzona jest tabela zawiera:
+    - wartość w komórce
+    - pozycja komórki
+    - index komórki
+    - style komórki
     '''
     def __init__(self, value, position, index):
         self.__value = value
         self.__position = position
-        self.__index = index #indeks typu A1, B5, nie chce usuwać pozycji bo łatwiej się z nich korzysta np przy mergowaniu 
-        self.__mergedWith = []
+        self.__index = index
         self.__styles = {'bold':0, 'cursive':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
 
     def getValue(self):
@@ -22,9 +22,6 @@ class Cell:
 
     def getIndex(self):
         return self.__index
-
-    def getMergedWith(self):
-        return self.__mergedWith
 
     def getStyles(self):
         return self.__styles
@@ -38,7 +35,7 @@ class Cell:
     def setIndex(self, x):
         self.__index=x
 
-    def setStyle(self, key): #key to byłby string, value 1 lub 0 
+    def setStyle(self, key):
         if self.__styles[key] == 1:
             self.__styles[key] = 0
         else:
@@ -47,15 +44,11 @@ class Cell:
     def resetStyles(self):
         self.__styles = {'bold':0, 'cursive':0, 'underlined':0, 'left-justified':0, 'right-justified':0, 'center-justified':0 }
 
-#wsm tabela mogłaby być singletonem ale aż tak dużo sie u nas nie dzieje więc nwm czy jest większy sens :v
 class Table:
     '''
     Klasa odzwierciedlająca tabele, składającą się
     z obiektów Cell i zawierająca informacje o rozmiarze
     (kolumny i wiersze), informacje o scalonych komórkach
-    idk czy to potrzebne ;_;)...
-    mergedCells - to bd lista list chyba... lub lepiej żeby po pozycjach leciec idk ;_;
-    gettery, settery
     '''
     def __init__(self, height, width):
         try:
@@ -100,34 +93,15 @@ class Table:
         self.__width = x
         self.__init__(self.__height, self.__width)
 
-    def setMergedCells(self, x): # jak import bd robiony to sie przyda a narazie to raczej nie bardzo
+    def setMergedCells(self, x):
         self.__mergedCells = x 
 
     def mergeCells(self, indexStr):
         '''
-        Dodajemy LISTE z pozycjami scalonych komórek,
-        potem najlepiej jakby w widoku była rozciągnięta jakby pierwsza komórka
-        egzampul:
-        ________________
-        |  |  |  |  |  | wiersz
-        ________________
-        |        |  |  | wiersz z scalonymi 3 komórkami a tak naperawde pierwszą rozciągniętą na tamte dwie
-
-        egzampul 2:
-        ____
-        |  | jest sobie taka kolumna dwu komórkowa
-        ---
-        |  |
-        ----
-        ____ kolumna z scalonymi komórkami 
-        |  |
-        |  |
-        ----
-        x D
+        Metoda służąca do scalania komórek podanych jako string np.'A1, B1', 'A1, A2', 'A1, B1, A2, B2'
         '''
         try:
             cellsIndexes = [cell.getIndex() for i in range(len(self.getContent())) for cell in self.getContent()[i]]
-            print(cellsIndexes)
             for ind in indexStr:
                 if ind not in cellsIndexes:
                     raise ValueError
@@ -137,24 +111,21 @@ class Table:
             for i in range(len(cellsIndexes)):
                 if cellsIndexes[i] in indexStr:
                     positions.append(cellsPos[i])
-            print('Pozycje',positions)
 
             positions = sorted(positions)
             #scalanie poziome
             if positions not in self.__mergedCells:
                 if positions == [positions[0] + i for i in range(len(positions))]:
                     if len(positions)<=self.__width:
-                        print('Pierwszy warunek działa')
                         self.__mergedCells.append(positions)
                         self.nullIfMerged()
                         return 1
                 #scalanie pionowo
                 elif positions == [positions[0] + self.__width * i for i in range(len(positions))]:
-                    print('Drugi warunek działa')
                     self.__mergedCells.append(positions)
                     self.nullIfMerged()
                     return 1
-                #blokowe scalanie np [A1,A2,B1,B2]
+                #blokowe scalanie
                 for i in range(len(positions)):
                     if i!=0:
                         if len(positions)%i==0:
@@ -178,12 +149,11 @@ class Table:
 
     def divideCells(self, index):
         '''
-        Służy do dzielenia komórek
+        Metoda do dzielenia komórek
         position - pozycja komórki którą rozdzielamy 
         '''
         try:
             cellsIndexes = [cell.getIndex() for i in range(len(self.getContent())) for cell in self.getContent()[i]]
-            cellsPos = [cell.getPosition() for i in range(len(self.getContent())) for cell in self.getContent()[i]]
             for i in range(len(cellsIndexes)):
                 if cellsIndexes[i] == index:
                     position = i
@@ -196,6 +166,9 @@ class Table:
             print('Zły index')
 
     def nullIfMerged(self):
+        '''
+        Metoda ustawiająca scalone komórki oprócz pierwszej na wartosć ''
+        '''
         for positions in self.getMergedCells():
             for row in range(len(self.__content)):
                 for cell in self.__content[row]:
@@ -205,18 +178,10 @@ class Table:
                 
 
     def setStyle(self, key, i, j):
+        '''
+        Metoda ustawiająca style
+        '''
         self.__content[i][j].setStyle(key)
-        print([cell.getStyles() for i in range(len(self.getContent())) for cell in self.getContent()[i]])
 
     def getCellStyle(self, i, j):
         return self.__content[i][j].getStyles()
-
-#Jakieś podstawowe testy żeby zobaczyć czy to wgl bangla
-#table = Table(3, 3)
-#print(table.getContent()[0][0].setValue(6))
-#table.mergeCells(['A0', 'A1'])
-#table.mergeCells(['B0', 'B1'])
-#print(table.getMergedCells())
-#print([cell.getValue() for i in range(len(table.getContent())) for cell in table.getContent()[i]])
-#table.divideCells('A0')
-#print(table.getMergedCells())
