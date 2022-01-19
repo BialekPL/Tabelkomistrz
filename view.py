@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter.ttk import Notebook
-from tkinter import Grid, messagebox
+from tkinter import Grid, PhotoImage, messagebox
 import string
 from controller import Controller
 import datetime
@@ -11,6 +11,8 @@ class View():
         self.controller = None
         self.lastClickedi = None  #style
         self.lastClickedj = None
+        p1 = PhotoImage(file = 'table.png')
+        self.root.iconphoto(False, p1)
         #region rozmiary itp.
         self.rows = 30      #liczba rzędów komórek
         self.columns = 15   #liczba kolumn komórek
