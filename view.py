@@ -335,6 +335,7 @@ class View():
         Daje znać o zmianie tekstu w komórce
         '''
         self.controller.setTable(self.returnTable())
+       
 
     def returnTable(self):
         '''
@@ -523,8 +524,10 @@ class View():
                     self.cells[i][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv1)
                     self.cells[i][j].grid(row=i+1, column=j+1, columnspan=1, sticky='news')
 
+                    sv2 = tk.StringVar()
+                    sv2.trace("w", lambda name, index, mode, sv1=sv1: self.callback(sv2))
                     # self.cells[i+1][j] = tk.Entry(self.cellFrame, width=15, justify='left',textvariable=sv1)
-                    self.cells[i+1][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv1)
+                    self.cells[i+1][j] = tk.Entry(self.cellFrame, width=15, textvariable=sv2)
                     self.cells[i+1][j].grid(row=i+2, column=j+1, rowspan=2, sticky='news')
 
         elif self.selectedRbutton=='dayCal':    #jeśli wybrano kalendarz dzienny
