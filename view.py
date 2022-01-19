@@ -153,13 +153,11 @@ class View():
         self.mainFrame.grid(row=1, column=0, sticky='news', pady = 10, padx = 10)
         #endregion
     
-    def onClick(self, row, col): #style!
+    def onClick(self, row, col):
         self.lastClickedi = row
         self.lastClickedj = col
-        print("clicked: ", self.lastClickedi, self.lastClickedj)
         
     def setStyle(self, styleStr):
-        print("style:", styleStr, " ",self.lastClickedi, self.lastClickedj)
         self.controller.setStyle(styleStr, self.lastClickedi, self.lastClickedj)
         cellStyle = self.controller.getStyle(self.lastClickedi, self.lastClickedj)
         if cellStyle['bold']==1 and cellStyle['cursive']==0 and cellStyle['underlined']==0:
@@ -241,7 +239,6 @@ class View():
 
     #region Funkcja - scalanie komórek
     def mergeCells(self):
-        print('mergeCells button')
         #merge w modelu
         indexStr = self.editEmerge.get().split(',')
         indexStr = [i.upper() for i in indexStr]
@@ -252,25 +249,6 @@ class View():
         if message == 0:
             tk.messagebox.showerror("Błąd", "Komórki wpisane w złym formacie, lub nie sąsiadują ze sobą")
         self.merging(message)
-        #merge w view
-        #text = self.editEmerge.get().split(',')
-        #text = [i.upper() for i in text]
-        #for i in text:
-        #     print("scalane komórki: ",i[0]," ",int(i[1]))
-        #sprawdzić czy poprawnie wpisane komórki
-
-        #sprawdzić czy komórki mogą być scalone
-
-        #sprawdzić czy są scalane rzędami czy kolumnami
-
-        #łącznie komórek w wierszu
-        # self.cells[0][4] = tk.Text(self.cellFrame,width=15,height=1)
-        # self.cells[0][4].grid(row=1, column=5, columnspan=2, sticky='news')
-        
-        #łączenie komórek w kolumnie
-        # self.cells[0][1] = tk.Text(self.cellFrame,width=15,height=1)
-        # self.cells[0][1].grid(row=1, column=2, rowspan=2, sticky='news')
-
     #endregion
 
     def merging(self, mes):
@@ -279,7 +257,6 @@ class View():
             #sprawdzanie czy poziomo
             if merged == [merged[0] + i for i in range(len(merged))]:
                 visible = merged[0]
-                print(visible)
                 #scalanie pierwszego rzędu
                 if (visible >= 0 and visible < self.columns):
                     content = self.controller.getContent()
@@ -352,24 +329,22 @@ class View():
         return table
 
     def divideCell(self):
+        '''
+        Funkcja służąca do dzielenia komórek.
+        '''
         index = self.editEdev.get()
-        print(index)
         if len(index) == 2:
             mergedCells = self.controller.dividing(index)
-            #self.mergeCells(mergedCells)
             self.setNotMerged(mergedCells)
 
     def setNotMerged(self, mergedCells):
-        print(mergedCells)
         for i in range(self.rows):
             for j in range(self.columns):
                 if i == 0:
                     position = j
                 else:
                     position = self.columns * i + j
-                print(position)
                 if any(position in sub for sub in mergedCells)!=True:
-                    print(position)
                     content = self.controller.getContent()
                     sv = tk.StringVar()
                     sv.set(content[i][j].getValue())
@@ -573,7 +548,6 @@ class View():
                 sv1 = tk.StringVar()
                 sv1.trace("w", lambda name, index, mode, sv1=sv1: self.callback(sv1))
                 self.cells[i][1] = tk.Entry(self.cellFrame, width=15, textvariable=sv1)
-                # self.cells[i][1] = tk.Entry(self.cellFrame, width=15, justify='left', textvariable=sv1)
                 self.cells[i][1].grid(row=i+1, column=2, columnspan=5, sticky='news')
 
     def styling(self, i, j):

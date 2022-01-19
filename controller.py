@@ -8,23 +8,26 @@ class Controller:
         self.table.setHeight(self.view.rows)
         self.table.setWidth(self.view.columns)
 
-    def changeTableSize(self, height, width):
+    def changeTableSize(self, height, width): 
+        '''
+        Metoda zmieniająca rozmiar tabeli.
+        '''
         self.table.setHeight(height)
         self.table.setWidth(width)
-        print(height, ' ', width)
 
-
-    def setTable(self, tab):
-        print(self.table.getContent())
+    def setTable(self, tab): 
+        '''
+        Metoda ustawiająca komórki np. po aktualizacji widoku.
+        '''
         for i in range(len(self.table.getContent())):
             for j in range(len(self.table.getContent()[i])):
                 self.table.getContent()[i][j].setValue(tab[i][j])
                 self.table.nullIfMerged()
-                print(self.table.getContent()[i][j].getValue())
 
-
-    def mergeCells(self, indexStr):
-        #sprawdzanie czy komórki istnieją
+    def mergeCells(self, indexStr): 
+        '''
+        Metoda scalająca komórki w modelu z widoku.
+        '''
         message = self.table.mergeCells(indexStr)
         return message
 
@@ -35,17 +38,23 @@ class Controller:
         return self.table.getContent()
 
     def dividing(self, index):
+        '''
+        Metoda dzieląca komórki w modelu
+        '''
         self.table.divideCells(index)
-        print(self.getMerged())
         return self.getMerged()
     
     def exportLatex(self):
-        print(self.table.getMergedCells())
-        print([cell.getIndex() for i in range(len(self.table.getContent())) for cell in self.table.getContent()[i]])
+        '''
+        Metoda eksportująca przy pomocy obiektu export.
+        '''
         tableToExport = copy.copy(self.table)
         return self.export.generateCode(tableToExport)
 
     def setStyle(self, styleStr,i , j):
+        ''''''
+
+
         self.table.setStyle(styleStr, i, j)
 
     def getStyle(self, i, j):
