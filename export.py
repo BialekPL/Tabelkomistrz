@@ -979,7 +979,7 @@ class Export:
         self.addHeader(table, None)
         self.addToBody(table)
         self.addEnding()
-        with open('test.txt', 'wb') as f:
+        with open('eksport.txt', 'wb') as f:
             f.write(self.header.encode('UTF8'))
             f.write(self.body.encode('UTF8'))
             f.write(self.ending.encode('UTF8'))
