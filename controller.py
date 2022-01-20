@@ -49,12 +49,15 @@ class Controller:
         Metoda eksportująca przy pomocy obiektu export.
         '''
         tableToExport = copy.copy(self.table)
-        return self.export.generateCode(tableToExport)
+        merged = copy.deepcopy(self.table.getMergedCells())
+        self.export.generateCode(tableToExport)
+        self.table.setMergedCells(merged)
+        print(self.table.getMergedCells())
 
     def setStyle(self, styleStr,i , j):
-        ''''''
-
-
+        '''
+        Metoda ustawiająca styl w komórce tabeli
+        '''
         self.table.setStyle(styleStr, i, j)
 
     def getStyle(self, i, j):
