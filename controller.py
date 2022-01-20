@@ -52,7 +52,6 @@ class Controller:
         merged = copy.deepcopy(self.table.getMergedCells())
         self.export.generateCode(tableToExport)
         self.table.setMergedCells(merged)
-        print(self.table.getMergedCells())
 
     def setStyle(self, styleStr,i , j):
         '''
