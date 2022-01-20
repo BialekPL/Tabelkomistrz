@@ -567,4 +567,4 @@ class View():
 
     def exportLatex(self):
         self.controller.exportLatex()
-        messagebox.showinfo(title='Eksport przeprowadzony pomyślnie', message='Tabela została wyeksportowana w formacie Latex do pliku export.txt')
+        messagebox.showinfo(title='Eksport przeprowadzony pomyślnie', message='Tabela została wyeksportowana w formacie Latex do pliku eksport.txt')
