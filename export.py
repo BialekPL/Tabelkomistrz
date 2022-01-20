@@ -979,10 +979,10 @@ class Export:
         self.addHeader(table, None)
         self.addToBody(table)
         self.addEnding()
-        with open('test.txt', 'w') as f:
-            f.write(self.header)
-            f.write(self.body)
-            f.write(self.ending)
+        with open('test.txt', 'wb') as f:
+            f.write(self.header.encode('UTF8'))
+            f.write(self.body.encode('UTF8'))
+            f.write(self.ending.encode('UTF8'))
         # wyczszczenie stringow
         self.header = ""
         self.body = ""
